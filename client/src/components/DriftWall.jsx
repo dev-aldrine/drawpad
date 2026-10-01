@@ -102,8 +102,10 @@ const DriftWall = ({
   const columnMeta = useMemo(() => {
     const unit = tileHeight + gap;
     return columnItems.map(col => {
+      // Height of one complete sequence of tiles
       const copyHeight = col.length * unit;
-      const copies = Math.max(2, Math.ceil((containerHeight * 3) / copyHeight) + 1);
+      // Guarantee at least 4 seamless repeating sequences so the screen is always filled
+      const copies = Math.max(4, Math.ceil((containerHeight * 2.5) / copyHeight) + 2);
       return { copyHeight, copies };
     });
   }, [columnItems, tileHeight, gap, containerHeight]);
