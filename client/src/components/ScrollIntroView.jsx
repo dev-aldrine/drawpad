@@ -28,13 +28,15 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
     }
   };
 
-  // Wheel listener with debounce
+  // Wheel listener with debounce and preventDefault
   useEffect(() => {
     const handleWheel = (e) => {
-      // Prevent rapid fire transitions
+      // Prevent browser from dragging/scrolling the whole window
+      e.preventDefault();
+
       if (isTransitioningRef.current) return;
 
-      if (Math.abs(e.deltaY) > 25) {
+      if (Math.abs(e.deltaY) > 15) {
         isTransitioningRef.current = true;
         if (e.deltaY > 0) {
           nextSlide();
@@ -43,14 +45,16 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
         }
         setTimeout(() => {
           isTransitioningRef.current = false;
-        }, 650);
+        }, 550);
       }
     };
 
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
         nextSlide();
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
         prevSlide();
       }
     };
@@ -64,7 +68,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
       const touchEndY = e.changedTouches[0].clientY;
       const diffY = touchStartYRef.current - touchEndY;
 
-      if (Math.abs(diffY) > 40) {
+      if (Math.abs(diffY) > 30) {
         isTransitioningRef.current = true;
         if (diffY > 0) {
           nextSlide();
@@ -73,11 +77,11 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
         }
         setTimeout(() => {
           isTransitioningRef.current = false;
-        }, 650);
+        }, 550);
       }
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
@@ -92,28 +96,28 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
 
   const slideVariants = {
     enter: (direction) => ({
-      y: direction > 0 ? 80 : -80,
       opacity: 0,
-      scale: 0.94,
-      rotateX: direction > 0 ? 12 : -12,
+      scale: 0.95,
+      rotateX: direction > 0 ? 8 : -8,
+      y: direction > 0 ? 20 : -20,
     }),
     center: {
-      y: 0,
       opacity: 1,
       scale: 1,
       rotateX: 0,
+      y: 0,
       transition: {
-        duration: 0.45,
+        duration: 0.35,
         ease: [0.16, 1, 0.3, 1],
       },
     },
     exit: (direction) => ({
-      y: direction > 0 ? -80 : 80,
       opacity: 0,
-      scale: 0.94,
-      rotateX: direction > 0 ? -12 : 12,
+      scale: 0.95,
+      rotateX: direction > 0 ? -8 : 8,
+      y: direction > 0 ? -20 : 20,
       transition: {
-        duration: 0.35,
+        duration: 0.25,
         ease: [0.16, 1, 0.3, 1],
       },
     }),

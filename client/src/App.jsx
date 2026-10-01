@@ -296,9 +296,11 @@ export function App() {
 const styles = {
   appWrapper: {
     position: 'relative',
-    minHeight: '100vh',
-    width: '100%',
+    height: '100vh',
+    width: '100vw',
     overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
   },
   cubesBackgroundWrapper: {
     position: 'fixed',
@@ -317,13 +319,16 @@ const styles = {
   appContainer: {
     maxWidth: '1080px',
     margin: '0 auto',
-    padding: '24px 16px 60px 16px',
+    padding: '16px 16px 20px 16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
+    gap: '14px',
     width: '100%',
+    height: '100%',
     position: 'relative',
     zIndex: 2,
+    overflowY: 'auto',
+    overflowX: 'hidden',
   },
   navbar: {
     display: 'flex',
