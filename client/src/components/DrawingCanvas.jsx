@@ -131,6 +131,8 @@ export const DrawingCanvas = ({ onImageExport, onNext, onBack, initialImage }) =
     }
   };
 
+  const preClearStateRef = useRef(null);
+
   const undo = () => {
     if (historyStep <= 0) return;
     const canvas = canvasRef.current;
@@ -150,11 +152,33 @@ export const DrawingCanvas = ({ onImageExport, onNext, onBack, initialImage }) =
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    // Save current snapshot before clearing so "Undo Clear" can restore it
+    preClearStateRef.current = canvas.toDataURL('image/png');
+
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setHasDrawn(false);
     saveState();
+  };
+
+  const undoClear = () => {
+    if (!preClearStateRef.current) {
+      undo();
+      return;
+    }
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = preClearStateRef.current;
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      setHasDrawn(true);
+      saveState();
+    };
   };
 
   const getCoordinates = (e) => {
@@ -253,17 +277,18 @@ export const DrawingCanvas = ({ onImageExport, onNext, onBack, initialImage }) =
           <FuseButton
             label="Clear"
             undoLabel="Undo Clear"
-            doneLabel="Cleared!"
+            doneLabel="Cleared"
             color="#1a1a1e"
             background="#fef2f2"
             fuseColor="#ef4444"
             size="sm"
             radius={8}
-            undoWindow={3500}
+            undoWindow={4000}
             fuse="bottom"
             fuseThickness={2.5}
-            commitOn="fuseEnd"
+            commitOn="press"
             onCommit={clearCanvas}
+            onUndo={undoClear}
           />
 
           <button 
