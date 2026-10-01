@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { VersionedTransaction } from '@solana/web3.js';
@@ -6,10 +6,12 @@ import confetti from 'canvas-confetti';
 import { DrawingCanvas } from './components/DrawingCanvas';
 import { TokenForm } from './components/TokenForm';
 import { SuccessModal } from './components/SuccessModal';
-import { Pen, Zap, Shield, Sparkles, Rocket } from '@sketchyicons/react';
+import { HowItWorks } from './components/HowItWorks';
+import { Pen, Sparkles } from '@sketchyicons/react';
 
 export function App() {
   const { publicKey, signTransaction, connected } = useWallet();
+  const studioRef = useRef(null);
 
   const [imageDataUrl, setImageDataUrl] = useState(null);
   const [formData, setFormData] = useState({
@@ -29,6 +31,12 @@ export function App() {
 
   const handleFormChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const scrollToStudio = () => {
+    if (studioRef.current) {
+      studioRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleLaunch = async () => {
@@ -182,7 +190,7 @@ export function App() {
         </div>
       </header>
 
-      {/* Hero Banner */}
+      {/* Hero Section */}
       <section style={styles.heroSection}>
         <div style={styles.heroBadge}>
           <Sparkles size={14} />
@@ -192,12 +200,15 @@ export function App() {
           Draw it. <span className="highlighter-tape-cyan">Launch it.</span>
         </h1>
         <p style={styles.heroDescription}>
-          Doodle your coin on the canvas, fill in the details, and launch directly to <strong>pump.fun</strong> in seconds.
+          The easiest way to doodle your coin, set token metadata, and launch directly to <strong>pump.fun</strong> in seconds.
         </p>
       </section>
 
+      {/* Introductory How It Works Section */}
+      <HowItWorks onStartDrawing={scrollToStudio} />
+
       {/* Main Studio Area */}
-      <main style={styles.studioGrid}>
+      <main ref={studioRef} style={styles.studioGrid}>
         {/* Left: Hand-drawn Canvas Studio */}
         <DrawingCanvas 
           onImageExport={(dataUrl) => setImageDataUrl(dataUrl)} 
@@ -214,31 +225,6 @@ export function App() {
           isWalletConnected={connected}
         />
       </main>
-
-      {/* Sketchy Feature Cards */}
-      <footer style={styles.featuresFooter}>
-        <div style={styles.featureCard} className="sketch-card">
-          <div style={styles.featureIconWrap}>
-            <Zap size={22} />
-          </div>
-          <h4 style={styles.featureTitle}>Instant Bonding Curve</h4>
-          <p style={styles.featureText}>Directly creates pump.fun token pool via PumpPortal API.</p>
-        </div>
-        <div style={styles.featureCard} className="sketch-card">
-          <div style={styles.featureIconWrap}>
-            <Pen size={22} />
-          </div>
-          <h4 style={styles.featureTitle}>100% Hand-Drawn Art</h4>
-          <p style={styles.featureText}>Your drawing is uploaded directly to decentralized IPFS metadata.</p>
-        </div>
-        <div style={styles.featureCard} className="sketch-card">
-          <div style={styles.featureIconWrap}>
-            <Shield size={22} />
-          </div>
-          <h4 style={styles.featureTitle}>Phantom Non-Custodial</h4>
-          <p style={styles.featureText}>You sign every launch transaction securely with your wallet.</p>
-        </div>
-      </footer>
 
       {/* Success Launch Modal */}
       {successData && (
@@ -363,42 +349,7 @@ const styles = {
     flexWrap: 'wrap',
     gap: '24px',
     width: '100%',
-  },
-  featuresFooter: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-    gap: '16px',
-    marginTop: '16px',
-  },
-  featureCard: {
-    padding: '18px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    textAlign: 'left',
-    backgroundColor: '#ffffff',
-  },
-  featureIconWrap: {
-    background: '#fef08a',
-    border: '2px solid #1a1a1e',
-    borderRadius: '8px',
-    width: '38px',
-    height: '38px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '1.5px 1.5px 0px #1a1a1e',
-  },
-  featureTitle: {
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#1a1a1e',
-    fontFamily: 'var(--font-heading)',
-  },
-  featureText: {
-    fontSize: '15px',
-    color: '#64748b',
-    lineHeight: '1.4',
+    scrollMarginTop: '20px',
   }
 };
 
