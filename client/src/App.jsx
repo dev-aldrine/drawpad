@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletButton } from './components/PhantomWalletButton';
 import { VersionedTransaction } from '@solana/web3.js';
 import confetti from 'canvas-confetti';
 import ClickSpark from './components/ClickSpark';
@@ -267,7 +267,7 @@ export function App() {
                 draggable
               />
 
-              <WalletMultiButton />
+              <PhantomWalletButton />
             </div>
           </header>
 
