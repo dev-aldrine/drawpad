@@ -1,5 +1,29 @@
 import React from 'react';
-import { Pen, Coins, Rocket, Shield, ArrowDown, Sparkles, Check, ChevronDown } from '@sketchyicons/react';
+import { motion } from 'framer-motion';
+import { Pen, Coins, Rocket, Check, ChevronDown } from '@sketchyicons/react';
+import RotatingText from './RotatingText';
+
+// 3D tilt card wrapper with Framer Motion spring physics
+const TiltStepCard = ({ children, delay = 0 }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40, rotateX: 15 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.7, delay, ease: [0.25, 1, 0.5, 1] }}
+      whileHover={{ 
+        y: -6, 
+        rotateX: 4, 
+        rotateY: -3, 
+        scale: 1.015,
+        transition: { duration: 0.25 } 
+      }}
+      style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 export const ScrollIntroView = ({ onLaunchNow }) => {
   const steps = [
@@ -56,8 +80,14 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
 
   return (
     <div style={styles.container}>
-      {/* Intro Hero Header */}
-      <section style={styles.introHero} className="sketch-card">
+      {/* Intro Hero with RotatingText Component */}
+      <motion.section 
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        style={styles.introHero} 
+        className="sketch-card"
+      >
         <div style={styles.tapeTop}>
           <span>DRAWPAD • HOW IT WORKS</span>
         </div>
@@ -69,14 +99,29 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
         </div>
 
         <h1 style={styles.mainTitle}>
-          How <span className="highlighter-tape-cyan">DrawPad</span> Works
+          Draw it.{' '}
+          <span className="highlighter-tape-cyan" style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
+            <RotatingText
+              texts={['Launch it.', 'Pump it.', 'Trade it.', 'Meme it.']}
+              mainClassName="justify-center"
+              staggerFrom="last"
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '-120%', opacity: 0 }}
+              staggerDuration={0.03}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              rotationInterval={2400}
+            />
+          </span>
         </h1>
         <p style={styles.heroDesc}>
-          Turn rough sketches into real live Solana tokens on <strong>pump.fun</strong> in 3 interactive steps. Scroll down to explore the process or jump straight into the studio.
+          Turn rough sketches into real live Solana tokens on <strong>pump.fun</strong> in 3 interactive steps. Scroll down to experience the 3D process.
         </p>
 
         <div style={styles.heroCtaGroup}>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="button"
             onClick={onLaunchNow}
             className="sketch-btn sketch-btn-green"
@@ -84,63 +129,72 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
           >
             <Pen size={20} />
             <span>Launch a Coin Now</span>
-          </button>
+          </motion.button>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Step-by-Step Vertical Flow with Connecting Sketch Lines */}
+      {/* 3D Animated Step-by-Step Vertical Flow */}
       <div style={styles.stepsTimeline}>
         {steps.map((step, idx) => (
           <div key={idx} style={styles.timelineItem}>
             {/* Timeline Node & Number */}
             <div style={styles.timelineNodeCol}>
-              <div style={{ ...styles.timelineNodeBadge, background: step.color }}>
+              <motion.div 
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20, delay: idx * 0.15 }}
+                style={{ ...styles.timelineNodeBadge, background: step.color }}
+              >
                 {step.num}
-              </div>
+              </motion.div>
               {idx < steps.length - 1 && <div style={styles.timelineLine} />}
             </div>
 
-            {/* Step Card Content */}
+            {/* 3D Tilt Step Card */}
             <div style={styles.stepCardWrap}>
-              <div 
-                style={{
-                  ...styles.stepCard,
-                  transform: idx % 2 === 0 ? 'rotate(-0.5deg)' : 'rotate(0.5deg)'
-                }}
-                className="sketch-card"
-              >
-                <div style={{ ...styles.cardTape, background: step.tapeColor }}>
-                  <span>{step.badge}</span>
-                </div>
+              <TiltStepCard delay={idx * 0.12}>
+                <div style={styles.stepCard} className="sketch-card">
+                  <div style={{ ...styles.cardTape, background: step.tapeColor }}>
+                    <span>{step.badge}</span>
+                  </div>
 
-                <div style={styles.cardHeader}>
-                  <div>
-                    <h2 style={styles.cardTitle}>{step.title}</h2>
-                    <span style={styles.cardSubtitle}>{step.subtitle}</span>
+                  <div style={styles.cardHeader}>
+                    <div>
+                      <h2 style={styles.cardTitle}>{step.title}</h2>
+                      <span style={styles.cardSubtitle}>{step.subtitle}</span>
+                    </div>
+                  </div>
+
+                  <p style={styles.cardDesc}>{step.desc}</p>
+
+                  {/* Highlights list */}
+                  <div style={styles.highlightsBox}>
+                    {step.highlights.map((h, i) => (
+                      <div key={i} style={styles.highlightRow}>
+                        <div style={styles.checkIconWrap}>
+                          <Check size={14} />
+                        </div>
+                        <span style={styles.highlightText}>{h}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-
-                <p style={styles.cardDesc}>{step.desc}</p>
-
-                {/* Highlights list */}
-                <div style={styles.highlightsBox}>
-                  {step.highlights.map((h, i) => (
-                    <div key={i} style={styles.highlightRow}>
-                      <div style={styles.checkIconWrap}>
-                        <Check size={14} />
-                      </div>
-                      <span style={styles.highlightText}>{h}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              </TiltStepCard>
             </div>
           </div>
         ))}
       </div>
 
       {/* Interactive FAQ Accordion Section */}
-      <section style={styles.faqSection} className="sketch-card">
+      <motion.section 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        style={styles.faqSection} 
+        className="sketch-card"
+      >
         <div style={styles.tapeFaq}>
           <span>FREQUENTLY ASKED QUESTIONS</span>
         </div>
@@ -157,14 +211,23 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
             </details>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Bottom Launch Call To Action */}
-      <div style={styles.bottomCtaWrap} className="sketch-card">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        style={styles.bottomCtaWrap} 
+        className="sketch-card"
+      >
         <div style={styles.bottomCtaInner}>
           <h2 style={styles.bottomCtaTitle}>Ready to launch your hand-drawn coin?</h2>
           <p style={styles.bottomCtaDesc}>Pick up your digital pencil and deploy to pump.fun in under 2 minutes.</p>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="button"
             onClick={onLaunchNow}
             className="sketch-btn sketch-btn-green"
@@ -172,9 +235,9 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
           >
             <Rocket size={22} />
             <span>Open Drawing Studio</span>
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
