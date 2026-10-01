@@ -259,7 +259,7 @@ export function App() {
                 size="md"
                 radius={10}
                 inset={3}
-                equalSlots={false}
+                equalSlots={true}
                 stretch={100}
                 squash={3}
                 speed={1}
