@@ -179,22 +179,23 @@ export function App() {
         {/* Interactive 3D Drifting Meme Wall Background */}
         <div style={styles.driftWallBackgroundWrapper} aria-hidden="true">
           <DriftWall
-            columns={7}
-            tileWidth={175}
-            tileHeight={125}
-            gap={26}
-            tilt={14}
-            turn={-12}
-            perspective={2000}
-            depth={40}
-            speed={28}
+            columns={8}
+            tileWidth={220}
+            tileHeight={220}
+            gap={48}
+            tilt={16}
+            turn={-14}
+            perspective={2400}
+            depth={30}
+            speed={38}
             direction="up"
-            variance={0.4}
-            parallax={0.4}
-            lift={36}
-            fade={0.35}
-            dim={0.72}
-            overlayColor="#fbf6ea"
+            variance={0.45}
+            parallax={0.6}
+            lift={140}
+            fade={0.6}
+            dim={1}
+            overlayColor="#060010"
+            roll={2}
           />
         </div>
 
