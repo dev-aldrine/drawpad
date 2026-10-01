@@ -10,8 +10,9 @@ import { StepNavigation } from './components/StepNavigation';
 import { ScrollIntroView } from './components/ScrollIntroView';
 import { DrawingCanvas } from './components/DrawingCanvas';
 import { TokenForm } from './components/TokenForm';
+import { LaunchedCoinsView } from './components/LaunchedCoinsView';
 import { SuccessModal } from './components/SuccessModal';
-import { Pen, Sparkles, BookOpen, Rocket } from '@sketchyicons/react';
+import { Pen, Sparkles, BookOpen, Rocket, Coins } from '@sketchyicons/react';
 
 export function App() {
   const { publicKey, signTransaction, connected } = useWallet();
@@ -120,6 +121,15 @@ export function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           signedTxBase64,
+          tokenInfo: {
+            name: formData.name,
+            symbol: formData.symbol,
+            description: formData.description,
+            mintPublicKey: launchTxData.mintPublicKey,
+            imageUrl: imageDataUrl,
+            initialBuySol: Number(formData.initialBuySol) || 0,
+            creator: publicKey.toBase58()
+          }
         }),
       });
 
@@ -236,11 +246,24 @@ export function App() {
                   onClick={() => setCurrentStep(2)}
                   style={{
                     ...styles.navTabBtn,
-                    background: currentStep >= 2 ? 'var(--marker-green)' : 'transparent',
-                    borderColor: currentStep >= 2 ? '#1a1a1e' : 'transparent',
+                    background: (currentStep === 2 || currentStep === 3) ? 'var(--marker-green)' : 'transparent',
+                    borderColor: (currentStep === 2 || currentStep === 3) ? '#1a1a1e' : 'transparent',
                   }}
                 >
                   <span>Launchpad Studio</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(4)}
+                  style={{
+                    ...styles.navTabBtn,
+                    background: currentStep === 4 ? 'var(--marker-cyan)' : 'transparent',
+                    borderColor: currentStep === 4 ? '#1a1a1e' : 'transparent',
+                  }}
+                >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Coins size={15} /> Launched Coins
+                  </span>
                 </button>
               </div>
 
@@ -253,7 +276,7 @@ export function App() {
           </header>
 
           {/* Header Stepper (visible on step 2 and 3) */}
-          {currentStep > 1 && (
+          {(currentStep === 2 || currentStep === 3) && (
             <StepNavigation
               currentStep={currentStep}
               onStepChange={(step) => setCurrentStep(step)}
@@ -292,6 +315,11 @@ export function App() {
                 statusMessage={statusMessage}
                 isWalletConnected={connected}
               />
+            )}
+
+            {/* STEP 4: Launched Coins Live Showcase */}
+            {currentStep === 4 && (
+              <LaunchedCoinsView onStartNewCoin={() => setCurrentStep(2)} />
             )}
           </main>
 
