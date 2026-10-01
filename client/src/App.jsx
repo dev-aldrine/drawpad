@@ -3,6 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { VersionedTransaction } from '@solana/web3.js';
 import confetti from 'canvas-confetti';
+import { BackgroundDoodles } from './components/BackgroundDoodles';
 import { StepNavigation } from './components/StepNavigation';
 import { IntroView } from './components/IntroView';
 import { DrawingCanvas } from './components/DrawingCanvas';
@@ -166,6 +167,9 @@ export function App() {
 
   return (
     <div style={styles.appContainer}>
+      {/* Background Doodles Everywhere */}
+      <BackgroundDoodles />
+
       {/* Navigation Bar */}
       <header style={styles.navbar} className="sketch-card">
         <div style={styles.logoGroup} onClick={() => setCurrentStep(1)} style={{ cursor: 'pointer', ...styles.logoGroup }}>
@@ -262,6 +266,8 @@ const styles = {
     flexDirection: 'column',
     gap: '20px',
     width: '100%',
+    position: 'relative',
+    zIndex: 1,
   },
   navbar: {
     display: 'flex',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pen, Coins, Rocket, ArrowRight, Sparkles, ShieldCheck, Zap } from '@sketchyicons/react';
+import { Pen, Coins, Rocket, ArrowRight, Zap } from '@sketchyicons/react';
 
 export const IntroView = ({ onProceed }) => {
   const steps = [
@@ -8,31 +8,49 @@ export const IntroView = ({ onProceed }) => {
       icon: <Pen size={28} />,
       title: 'Doodle your Coin Artwork',
       desc: 'Use the sketchbook canvas to hand-draw your meme logo. Pick custom stroke widths, colors, and shape stamps.',
-      badge: 'Step 1'
+      badge: 'Step 1',
+      color: 'var(--marker-yellow)',
+      sticker: 'PENCIL'
     },
     {
       num: '02',
       icon: <Coins size={28} />,
       title: 'Set Token Details & Ticker',
       desc: 'Give your coin a name, ticker ($TICKER), description, and optionally set initial dev buy SOL & slippage.',
-      badge: 'Step 2'
+      badge: 'Step 2',
+      color: 'var(--marker-green)',
+      sticker: 'SOLANA'
     },
     {
       num: '03',
       icon: <Rocket size={28} />,
       title: 'Launch on Pump.fun Bonding Curve',
       desc: 'Sign the non-custodial transaction with your Phantom wallet. Metadata uploads to IPFS and the coin goes live!',
-      badge: 'Step 3'
+      badge: 'Step 3',
+      color: 'var(--marker-cyan)',
+      sticker: 'BONDING'
     }
   ];
 
   return (
     <div style={styles.container} className="sketch-card">
+      {/* Decorative Washi Tapes */}
       <div style={styles.tape}>
         <span>WELCOME TO DRAWPAD</span>
       </div>
 
+      {/* Hand-drawn corner doodles inside card */}
+      <svg style={styles.cardCornerDoodleTop} width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#ca8a04" strokeWidth="2">
+        <path d="M5 35 Q 5 5 35 5" strokeDasharray="3,3" />
+        <circle cx="35" cy="5" r="3" fill="#ca8a04" />
+      </svg>
+
       <div style={styles.heroWrap}>
+        <div style={styles.doodleBadgeRow}>
+          <span style={styles.pinIcon}>📌</span>
+          <span style={styles.handwrittenTag}>Handmade for Solana Meme Creators</span>
+          <span style={styles.sparkleIcon}>✦</span>
+        </div>
         <h2 style={styles.title}>
           How DrawPad Works
         </h2>
@@ -41,33 +59,45 @@ export const IntroView = ({ onProceed }) => {
         </p>
       </div>
 
-      {/* 3 Step Cards */}
+      {/* 3 Step Cards with Playful Tilts & Doodles */}
       <div style={styles.stepsGrid}>
         {steps.map((s, idx) => (
-          <div key={idx} style={styles.stepCard}>
+          <div 
+            key={idx} 
+            style={{
+              ...styles.stepCard,
+              transform: idx === 0 ? 'rotate(-0.8deg)' : idx === 2 ? 'rotate(0.8deg)' : 'none'
+            }}
+          >
             <div style={styles.cardHeader}>
               <div style={styles.stepBadge}>{s.badge}</div>
-              <div style={styles.iconBox}>{s.icon}</div>
+              <div style={{ ...styles.iconBox, background: s.color }}>{s.icon}</div>
             </div>
             <h3 style={styles.stepTitle}>{s.title}</h3>
             <p style={styles.stepDesc}>{s.desc}</p>
+            <div style={styles.stepFooterDoodle}>
+              <span style={styles.stickerBadge}>#{s.sticker}</span>
+              <span style={styles.scribbleLine}>~~~~~</span>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Info highlights banner */}
+      {/* Doodled Info highlights banner */}
       <div style={styles.infoBanner}>
         <div style={styles.infoItem}>
-          <Zap size={18} />
-          <span>Direct pump.fun liquidity pool</span>
+          <Zap size={20} />
+          <span>Direct pump.fun bonding curve pool</span>
         </div>
+        <div style={styles.dotDivider}>•</div>
         <div style={styles.infoItem}>
-          <Pen size={18} />
+          <Pen size={20} />
           <span>Decentralized IPFS artwork storage</span>
         </div>
+        <div style={styles.dotDivider}>•</div>
         <div style={styles.infoItem}>
-          <Rocket size={18} />
-          <span>Instant Phantom wallet signing</span>
+          <Rocket size={20} />
+          <span>Instant Phantom non-custodial signing</span>
         </div>
       </div>
 
@@ -80,7 +110,7 @@ export const IntroView = ({ onProceed }) => {
           style={styles.proceedBtn}
         >
           <span>Step 1: Open Drawing Studio</span>
-          <ArrowRight size={20} />
+          <ArrowRight size={22} />
         </button>
       </div>
     </div>
@@ -89,10 +119,10 @@ export const IntroView = ({ onProceed }) => {
 
 const styles = {
   container: {
-    padding: '36px 28px 30px 28px',
+    padding: '38px 30px 32px 30px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: '26px',
     width: '100%',
     position: 'relative',
     backgroundColor: '#ffffff',
@@ -111,14 +141,45 @@ const styles = {
     letterSpacing: '0.08em',
     color: '#1a1a1e',
   },
+  cardCornerDoodleTop: {
+    position: 'absolute',
+    top: '12px',
+    left: '12px',
+    opacity: 0.6,
+  },
   heroWrap: {
     textAlign: 'center',
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center',
     gap: '8px',
   },
+  doodleBadgeRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    background: '#fef9c3',
+    border: '1.5px solid #1a1a1e',
+    borderRadius: '16px',
+    padding: '2px 12px',
+    boxShadow: '1px 1px 0px #1a1a1e',
+  },
+  pinIcon: {
+    fontSize: '12px',
+  },
+  handwrittenTag: {
+    fontFamily: 'var(--font-handwriting)',
+    fontSize: '14px',
+    fontWeight: '700',
+    color: '#1a1a1e',
+  },
+  sparkleIcon: {
+    fontSize: '14px',
+    color: '#ca8a04',
+    fontWeight: 'bold',
+  },
   title: {
-    fontSize: '34px',
+    fontSize: '36px',
     fontWeight: '800',
     color: '#1a1a1e',
     fontFamily: 'var(--font-heading)',
@@ -134,17 +195,18 @@ const styles = {
   stepsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-    gap: '18px',
+    gap: '20px',
   },
   stepCard: {
     background: '#f8fafc',
     border: '2px solid #1a1a1e',
-    borderRadius: '12px',
-    padding: '20px',
+    borderRadius: '14px',
+    padding: '22px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
-    boxShadow: '2px 2px 0px #1a1a1e',
+    gap: '12px',
+    boxShadow: '3px 3px 0px #1a1a1e',
+    transition: 'transform 0.15s ease',
   },
   cardHeader: {
     display: 'flex',
@@ -155,24 +217,24 @@ const styles = {
     background: '#fed7aa',
     border: '1.5px solid #1a1a1e',
     borderRadius: '6px',
-    padding: '2px 8px',
+    padding: '2px 10px',
     fontSize: '12px',
     fontWeight: '700',
     fontFamily: 'var(--font-mono)',
   },
   iconBox: {
-    width: '44px',
-    height: '44px',
+    width: '46px',
+    height: '46px',
     borderRadius: '10px',
     border: '2px solid #1a1a1e',
-    background: 'var(--marker-yellow)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: '1.5px 1.5px 0px #1a1a1e',
+    color: '#1a1a1e',
   },
   stepTitle: {
-    fontSize: '20px',
+    fontSize: '21px',
     fontWeight: '700',
     color: '#1a1a1e',
     fontFamily: 'var(--font-heading)',
@@ -183,15 +245,36 @@ const styles = {
     color: '#475569',
     lineHeight: '1.4',
   },
+  stepFooterDoodle: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTop: '1.5px dashed #cbd5e1',
+    paddingTop: '8px',
+    marginTop: 'auto',
+  },
+  stickerBadge: {
+    fontFamily: 'var(--font-mono)',
+    fontSize: '11px',
+    fontWeight: '700',
+    color: '#64748b',
+  },
+  scribbleLine: {
+    fontFamily: 'var(--font-mono)',
+    color: '#cbd5e1',
+    fontWeight: 'bold',
+  },
   infoBanner: {
     display: 'flex',
     justifyContent: 'space-around',
+    alignItems: 'center',
     flexWrap: 'wrap',
-    gap: '12px',
-    padding: '14px',
+    gap: '14px',
+    padding: '14px 18px',
     background: '#fef08a',
     border: '2px dashed #1a1a1e',
-    borderRadius: '10px',
+    borderRadius: '12px',
+    boxShadow: '2px 2px 0px #1a1a1e',
   },
   infoItem: {
     display: 'flex',
@@ -201,13 +284,18 @@ const styles = {
     fontWeight: '700',
     color: '#1a1a1e',
   },
+  dotDivider: {
+    color: '#1a1a1e',
+    fontWeight: 'bold',
+    opacity: 0.5,
+  },
   actionRow: {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: '6px',
+    marginTop: '4px',
   },
   proceedBtn: {
-    padding: '14px 32px',
+    padding: '14px 34px',
     fontSize: '20px',
   }
 };

@@ -2,8 +2,7 @@
 
 :root {
   /* Hand-drawn Sketch / Notebook Palette */
-  --bg-paper: #fbf7ee;
-  --bg-paper-alt: #f4efe1;
+  --bg-paper: #fbf6ea;
   --card-bg: #ffffff;
   --ink-black: #1a1a1e;
   --ink-pencil: #2d3142;
@@ -25,7 +24,6 @@
   --sketch-shadow: 4px 4px 0px #1a1a1e;
   --sketch-shadow-sm: 2px 2px 0px #1a1a1e;
   --sketch-shadow-lg: 6px 6px 0px #1a1a1e;
-  --sketch-shadow-hover: 6px 6px 0px #1a1a1e;
 
   /* Typography */
   --font-handwriting: 'Patrick Hand', 'Kalam', cursive, sans-serif;
@@ -41,11 +39,12 @@
 
 body {
   background-color: var(--bg-paper);
-  /* Notebook Grid Pattern */
+  /* Doodled graph & margin ruler pattern */
   background-image: 
-    linear-gradient(rgba(26, 26, 30, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26, 26, 30, 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
+    linear-gradient(rgba(26, 26, 30, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 26, 30, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, transparent 60px, rgba(239, 68, 68, 0.15) 60px, rgba(239, 68, 68, 0.15) 62px, transparent 62px);
+  background-size: 24px 24px, 24px 24px, 100% 100%;
   background-attachment: fixed;
   color: var(--ink-pencil);
   font-family: var(--font-handwriting);
@@ -79,14 +78,6 @@ body {
   border-radius: 12px 14px 10px 15px;
   box-shadow: var(--sketch-shadow);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.sketch-card-tilted-left {
-  transform: rotate(-0.5deg);
-}
-
-.sketch-card-tilted-right {
-  transform: rotate(0.5deg);
 }
 
 /* Sketch Buttons */
@@ -132,13 +123,6 @@ body {
   background: #86efac;
 }
 
-.sketch-btn-orange {
-  background: var(--marker-orange);
-}
-.sketch-btn-orange:hover:not(:disabled) {
-  background: #fdba74;
-}
-
 /* Highlighter tape effect */
 .highlighter-tape {
   background: var(--marker-yellow);
@@ -151,14 +135,20 @@ body {
 
 .highlighter-tape-cyan {
   background: var(--marker-cyan);
+  padding: 2px 8px;
+  border-radius: 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  font-weight: 700;
 }
 
 .highlighter-tape-pink {
   background: var(--marker-pink);
-}
-
-.highlighter-tape-green {
-  background: var(--marker-green);
+  padding: 2px 8px;
+  border-radius: 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  font-weight: 700;
 }
 
 /* Solana Wallet Adapter Overrides for Sketch Theme */
@@ -207,15 +197,4 @@ body {
   border: 2px solid var(--sketch-border) !important;
   box-shadow: var(--sketch-shadow-sm) !important;
   margin-bottom: 8px !important;
-}
-
-/* Wobbly doodle border animations */
-@keyframes scribble-shake {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-0.5deg); }
-  75% { transform: rotate(0.5deg); }
-}
-
-.doodle-shake:hover {
-  animation: scribble-shake 0.3s infinite ease-in-out;
 }
