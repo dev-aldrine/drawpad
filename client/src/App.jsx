@@ -267,10 +267,6 @@ export function App() {
                 </button>
               </div>
 
-              <div style={styles.networkBadge}>
-                <span style={styles.activeDot}></span>
-                <span>Solana Mainnet</span>
-              </div>
               <WalletMultiButton />
             </div>
           </header>
@@ -431,26 +427,6 @@ const styles = {
     fontFamily: 'var(--font-handwriting)',
     color: '#1a1a1e',
     transition: 'all 0.15s ease',
-  },
-  networkBadge: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    background: '#f8fafc',
-    border: '2px solid #1a1a1e',
-    borderRadius: '10px',
-    padding: '4px 10px',
-    fontSize: '14px',
-    fontWeight: '700',
-    color: '#1a1a1e',
-    boxShadow: '1.5px 1.5px 0px #1a1a1e',
-  },
-  activeDot: {
-    width: '8px',
-    height: '8px',
-    borderRadius: '50%',
-    backgroundColor: '#16a34a',
-    boxShadow: '0 0 4px #16a34a',
   },
   wizardMain: {
     width: '100%',
