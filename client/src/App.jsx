@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { VersionedTransaction } from '@solana/web3.js';
@@ -6,16 +6,16 @@ import confetti from 'canvas-confetti';
 import Cubes from './components/Cubes';
 import { BackgroundDoodles } from './components/BackgroundDoodles';
 import { StepNavigation } from './components/StepNavigation';
-import { IntroView } from './components/IntroView';
+import { ScrollIntroView } from './components/ScrollIntroView';
 import { DrawingCanvas } from './components/DrawingCanvas';
 import { TokenForm } from './components/TokenForm';
 import { SuccessModal } from './components/SuccessModal';
-import { Pen, Sparkles } from '@sketchyicons/react';
+import { Pen, Sparkles, BookOpen, Rocket } from '@sketchyicons/react';
 
 export function App() {
   const { publicKey, signTransaction, connected } = useWallet();
 
-  // Wizard state: Step 1 (Intro) -> Step 2 (Drawing) -> Step 3 (Token Form)
+  // Navigation mode: 1 = How It Works (Scrollable Intro), 2 = Studio Canvas, 3 = Token Form & Launch
   const [currentStep, setCurrentStep] = useState(1);
 
   const [imageDataUrl, setImageDataUrl] = useState(null);
@@ -168,7 +168,7 @@ export function App() {
 
   return (
     <div style={styles.appWrapper}>
-      {/* Interactive Cubes Grid Background */}
+      {/* Interactive 3D Cubes Grid Background */}
       <div style={styles.cubesBackgroundWrapper} aria-hidden="true">
         <Cubes 
           gridSize={10}
@@ -184,10 +184,10 @@ export function App() {
         />
       </div>
 
-      {/* Background Floating Doodles */}
+      {/* Floating Animated Background Doodles */}
       <BackgroundDoodles />
 
-      {/* Foreground Main Container */}
+      {/* Foreground Container */}
       <div style={styles.appContainer}>
         {/* Navigation Bar */}
         <header style={styles.navbar} className="sketch-card">
@@ -204,6 +204,31 @@ export function App() {
           </div>
 
           <div style={styles.navActions}>
+            <div style={styles.navTabs}>
+              <button
+                type="button"
+                onClick={() => setCurrentStep(1)}
+                style={{
+                  ...styles.navTabBtn,
+                  background: currentStep === 1 ? 'var(--marker-yellow)' : 'transparent',
+                  borderColor: currentStep === 1 ? '#1a1a1e' : 'transparent',
+                }}
+              >
+                <span>How It Works</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentStep(2)}
+                style={{
+                  ...styles.navTabBtn,
+                  background: currentStep >= 2 ? 'var(--marker-green)' : 'transparent',
+                  borderColor: currentStep >= 2 ? '#1a1a1e' : 'transparent',
+                }}
+              >
+                <span>Launchpad Studio</span>
+              </button>
+            </div>
+
             <div style={styles.networkBadge}>
               <span style={styles.activeDot}></span>
               <span>Solana Mainnet</span>
@@ -212,30 +237,21 @@ export function App() {
           </div>
         </header>
 
-        {/* Hero Header */}
-        <section style={styles.heroSection}>
-          <div style={styles.heroBadge}>
-            <Sparkles size={14} />
-            <span>THE HAND-DRAWN SOLANA LAUNCHPAD</span>
-          </div>
-          <h1 style={styles.mainTitle}>
-            Draw it. <span className="highlighter-tape-cyan">Launch it.</span>
-          </h1>
-        </section>
+        {/* Header Stepper (visible on step 2 and 3) */}
+        {currentStep > 1 && (
+          <StepNavigation
+            currentStep={currentStep}
+            onStepChange={(step) => setCurrentStep(step)}
+            canProceedToStep2={true}
+            canProceedToStep3={!!imageDataUrl}
+          />
+        )}
 
-        {/* Step Wizard Navigation Header */}
-        <StepNavigation
-          currentStep={currentStep}
-          onStepChange={(step) => setCurrentStep(step)}
-          canProceedToStep2={true}
-          canProceedToStep3={!!imageDataUrl}
-        />
-
-        {/* Wizard Content Views */}
+        {/* Wizard Main Area */}
         <main style={styles.wizardMain}>
-          {/* STEP 1: Intro / How It Works */}
+          {/* STEP 1: Ideapad-style Scrollable Step-by-Step Intro & FAQs */}
           {currentStep === 1 && (
-            <IntroView onProceed={() => setCurrentStep(2)} />
+            <ScrollIntroView onLaunchNow={() => setCurrentStep(2)} />
           )}
 
           {/* STEP 2: Dedicated Canvas Studio */}
@@ -314,6 +330,8 @@ const styles = {
     alignItems: 'center',
     padding: '12px 20px',
     backgroundColor: '#ffffff',
+    flexWrap: 'wrap',
+    gap: '12px',
   },
   logoGroup: {
     display: 'flex',
@@ -348,6 +366,25 @@ const styles = {
     gap: '12px',
     flexWrap: 'wrap',
   },
+  navTabs: {
+    display: 'flex',
+    gap: '6px',
+    background: '#f8fafc',
+    border: '1.5px solid #1a1a1e',
+    borderRadius: '10px',
+    padding: '3px',
+  },
+  navTabBtn: {
+    border: '1.5px solid transparent',
+    borderRadius: '8px',
+    padding: '5px 12px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '700',
+    fontFamily: 'var(--font-handwriting)',
+    color: '#1a1a1e',
+    transition: 'all 0.15s ease',
+  },
   networkBadge: {
     display: 'flex',
     alignItems: 'center',
@@ -367,33 +404,6 @@ const styles = {
     borderRadius: '50%',
     backgroundColor: '#16a34a',
     boxShadow: '0 0 4px #16a34a',
-  },
-  heroSection: {
-    textAlign: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '6px',
-  },
-  heroBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    background: '#fed7aa',
-    border: '2px dashed #1a1a1e',
-    color: '#1a1a1e',
-    borderRadius: '20px',
-    padding: '4px 16px',
-    fontSize: '13px',
-    fontWeight: '700',
-    fontFamily: 'var(--font-mono)',
-  },
-  mainTitle: {
-    fontSize: '40px',
-    fontWeight: '800',
-    color: '#1a1a1e',
-    fontFamily: 'var(--font-heading)',
-    lineHeight: '1.2',
   },
   wizardMain: {
     width: '100%',
