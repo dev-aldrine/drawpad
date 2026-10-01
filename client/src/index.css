@@ -50,6 +50,7 @@ body {
   font-family: var(--font-handwriting);
   font-size: 18px;
   min-height: 100vh;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -71,16 +72,78 @@ body {
   background: #94a3b8;
 }
 
-/* Sketch Box Utility (Wobbly border & hard sketch drop shadow) */
+/* 🎨 Fluid Doodle Keyframe Animations */
+@keyframes doodle-float-1 {
+  0%, 100% { transform: translateY(0px) rotate(-12deg); }
+  50% { transform: translateY(-10px) rotate(-8deg); }
+}
+
+@keyframes doodle-float-2 {
+  0%, 100% { transform: translateY(0px) rotate(18deg); }
+  50% { transform: translateY(-12px) rotate(22deg); }
+}
+
+@keyframes doodle-float-3 {
+  0%, 100% { transform: translateY(0px) rotate(35deg); }
+  50% { transform: translateY(-8px) rotate(30deg); }
+}
+
+@keyframes doodle-float-4 {
+  0%, 100% { transform: translateY(0px) rotate(-20deg); }
+  50% { transform: translateY(-14px) rotate(-16deg); }
+}
+
+@keyframes doodle-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-1.5deg); }
+  75% { transform: rotate(1.5deg); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes tape-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.08); }
+}
+
+/* Animation Classes */
+.animate-float-1 {
+  animation: doodle-float-1 4.5s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: doodle-float-2 5.5s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: doodle-float-3 5s ease-in-out infinite;
+}
+
+.animate-float-4 {
+  animation: doodle-float-4 6s ease-in-out infinite;
+}
+
+.animate-wiggle-hover:hover {
+  animation: doodle-wiggle 0.3s ease-in-out infinite;
+}
+
+/* Sketch Box Utility */
 .sketch-card {
   background: var(--card-bg);
   border: 2.5px solid var(--sketch-border);
   border-radius: 12px 14px 10px 15px;
   box-shadow: var(--sketch-shadow);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Sketch Buttons */
+.sketch-card:hover {
+  box-shadow: var(--sketch-shadow-lg);
+}
+
+/* Sketch Buttons with Spring Animations */
 .sketch-btn {
   font-family: var(--font-handwriting);
   font-size: 19px;
@@ -96,17 +159,17 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.12s ease;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sketch-btn:hover:not(:disabled) {
-  transform: translate(-2px, -2px);
+  transform: translate(-3px, -3px) rotate(-0.5deg);
   box-shadow: var(--sketch-shadow);
   background: #fde047;
 }
 
 .sketch-btn:active:not(:disabled) {
-  transform: translate(2px, 2px);
+  transform: translate(2px, 2px) rotate(0deg);
   box-shadow: 0px 0px 0px #1a1a1e;
 }
 
@@ -123,35 +186,41 @@ body {
   background: #86efac;
 }
 
-/* Highlighter tape effect */
-.highlighter-tape {
-  background: var(--marker-yellow);
+/* Highlighter tape effect with hover tilt */
+.highlighter-tape,
+.highlighter-tape-cyan,
+.highlighter-tape-pink {
+  display: inline-block;
   padding: 2px 8px;
   border-radius: 4px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   font-weight: 700;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.highlighter-tape {
+  background: var(--marker-yellow);
+}
+.highlighter-tape:hover {
+  transform: rotate(-1.5deg) scale(1.05);
 }
 
 .highlighter-tape-cyan {
   background: var(--marker-cyan);
-  padding: 2px 8px;
-  border-radius: 4px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  font-weight: 700;
+}
+.highlighter-tape-cyan:hover {
+  transform: rotate(1.5deg) scale(1.05);
 }
 
 .highlighter-tape-pink {
   background: var(--marker-pink);
-  padding: 2px 8px;
-  border-radius: 4px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  font-weight: 700;
+}
+.highlighter-tape-pink:hover {
+  transform: rotate(-1.5deg) scale(1.05);
 }
 
-/* Solana Wallet Adapter Overrides for Sketch Theme */
+/* Solana Wallet Adapter Overrides */
 .wallet-adapter-button {
   font-family: var(--font-handwriting) !important;
   font-size: 18px !important;
@@ -161,14 +230,14 @@ body {
   border: 2.5px solid var(--sketch-border) !important;
   border-radius: 10px 12px 9px 13px !important;
   box-shadow: var(--sketch-shadow-sm) !important;
-  transition: all 0.12s ease !important;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
   height: 42px !important;
   padding: 0 16px !important;
 }
 
 .wallet-adapter-button:hover {
   background: #7dd3fc !important;
-  transform: translate(-2px, -2px) !important;
+  transform: translate(-3px, -3px) rotate(-1deg) !important;
   box-shadow: var(--sketch-shadow) !important;
 }
 
@@ -184,6 +253,7 @@ body {
   box-shadow: var(--sketch-shadow-lg) !important;
   color: var(--ink-black) !important;
   font-family: var(--font-handwriting) !important;
+  animation: pulse-subtle 0.25s ease;
 }
 
 .wallet-adapter-modal-title {

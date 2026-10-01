@@ -1,11 +1,11 @@
 import React from 'react';
-import { Pen, Coins, Rocket, ArrowRight, Zap } from '@sketchyicons/react';
+import { Pen, Coins, Rocket, ArrowRight, Zap, Sparkles } from '@sketchyicons/react';
 
 export const IntroView = ({ onProceed }) => {
   const steps = [
     {
       num: '01',
-      icon: <Pen size={28} />,
+      icon: <Pen size={30} />,
       title: 'Doodle your Coin Artwork',
       desc: 'Use the sketchbook canvas to hand-draw your meme logo. Pick custom stroke widths, colors, and shape stamps.',
       badge: 'Step 1',
@@ -14,7 +14,7 @@ export const IntroView = ({ onProceed }) => {
     },
     {
       num: '02',
-      icon: <Coins size={28} />,
+      icon: <Coins size={30} />,
       title: 'Set Token Details & Ticker',
       desc: 'Give your coin a name, ticker ($TICKER), description, and optionally set initial dev buy SOL & slippage.',
       badge: 'Step 2',
@@ -23,7 +23,7 @@ export const IntroView = ({ onProceed }) => {
     },
     {
       num: '03',
-      icon: <Rocket size={28} />,
+      icon: <Rocket size={30} />,
       title: 'Launch on Pump.fun Bonding Curve',
       desc: 'Sign the non-custodial transaction with your Phantom wallet. Metadata uploads to IPFS and the coin goes live!',
       badge: 'Step 3',
@@ -35,21 +35,15 @@ export const IntroView = ({ onProceed }) => {
   return (
     <div style={styles.container} className="sketch-card">
       {/* Decorative Washi Tapes */}
-      <div style={styles.tape}>
+      <div style={styles.tape} className="animate-wiggle-hover">
         <span>WELCOME TO DRAWPAD</span>
       </div>
 
-      {/* Hand-drawn corner doodles inside card */}
-      <svg style={styles.cardCornerDoodleTop} width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#ca8a04" strokeWidth="2">
-        <path d="M5 35 Q 5 5 35 5" strokeDasharray="3,3" />
-        <circle cx="35" cy="5" r="3" fill="#ca8a04" />
-      </svg>
-
       <div style={styles.heroWrap}>
-        <div style={styles.doodleBadgeRow}>
+        <div style={styles.doodleBadgeRow} className="animate-wiggle-hover">
           <span style={styles.pinIcon}>📌</span>
           <span style={styles.handwrittenTag}>Handmade for Solana Meme Creators</span>
-          <span style={styles.sparkleIcon}>✦</span>
+          <Sparkles size={16} />
         </div>
         <h2 style={styles.title}>
           How DrawPad Works
@@ -59,7 +53,7 @@ export const IntroView = ({ onProceed }) => {
         </p>
       </div>
 
-      {/* 3 Step Cards with Playful Tilts & Doodles */}
+      {/* 3 Step Cards with Hover Spring Animations */}
       <div style={styles.stepsGrid}>
         {steps.map((s, idx) => (
           <div 
@@ -68,6 +62,7 @@ export const IntroView = ({ onProceed }) => {
               ...styles.stepCard,
               transform: idx === 0 ? 'rotate(-0.8deg)' : idx === 2 ? 'rotate(0.8deg)' : 'none'
             }}
+            className="sketch-card animate-wiggle-hover"
           >
             <div style={styles.cardHeader}>
               <div style={styles.stepBadge}>{s.badge}</div>
@@ -140,12 +135,7 @@ const styles = {
     fontWeight: '700',
     letterSpacing: '0.08em',
     color: '#1a1a1e',
-  },
-  cardCornerDoodleTop: {
-    position: 'absolute',
-    top: '12px',
-    left: '12px',
-    opacity: 0.6,
+    cursor: 'pointer',
   },
   heroWrap: {
     textAlign: 'center',
@@ -161,22 +151,19 @@ const styles = {
     background: '#fef9c3',
     border: '1.5px solid #1a1a1e',
     borderRadius: '16px',
-    padding: '2px 12px',
-    boxShadow: '1px 1px 0px #1a1a1e',
+    padding: '4px 14px',
+    boxShadow: '1.5px 1.5px 0px #1a1a1e',
+    cursor: 'pointer',
+    transition: 'transform 0.15s ease',
   },
   pinIcon: {
-    fontSize: '12px',
+    fontSize: '13px',
   },
   handwrittenTag: {
     fontFamily: 'var(--font-handwriting)',
-    fontSize: '14px',
+    fontSize: '15px',
     fontWeight: '700',
     color: '#1a1a1e',
-  },
-  sparkleIcon: {
-    fontSize: '14px',
-    color: '#ca8a04',
-    fontWeight: 'bold',
   },
   title: {
     fontSize: '36px',
@@ -206,7 +193,7 @@ const styles = {
     flexDirection: 'column',
     gap: '12px',
     boxShadow: '3px 3px 0px #1a1a1e',
-    transition: 'transform 0.15s ease',
+    cursor: 'default',
   },
   cardHeader: {
     display: 'flex',
@@ -223,8 +210,8 @@ const styles = {
     fontFamily: 'var(--font-mono)',
   },
   iconBox: {
-    width: '46px',
-    height: '46px',
+    width: '48px',
+    height: '48px',
     borderRadius: '10px',
     border: '2px solid #1a1a1e',
     display: 'flex',
