@@ -54,22 +54,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom Scrollbar with sketch style */
+/* Hide Scrollbars globally so page layout/width remains 100% fixed */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar,
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-paper);
-  border-left: 2px solid var(--sketch-border);
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border: 2px solid var(--sketch-border);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
 }
 
 /* 🎨 Fluid Doodle Keyframe Animations */
