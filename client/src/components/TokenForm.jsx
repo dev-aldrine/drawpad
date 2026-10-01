@@ -186,7 +186,7 @@ export const TokenForm = ({
         ) : (
           <>
             <Sparkles size={20} />
-            <span>{!isWalletConnected ? '👉 Connect Phantom to Launch' : '🚀 Mint & Launch to Pump.fun'}</span>
+            <span>{!isWalletConnected ? '👉 Connect Phantom to Launch' : '🚀 Launch to Pump.fun'}</span>
           </>
         )}
       </button>

@@ -191,13 +191,13 @@ export function App() {
       {/* Hero Banner with Hand-Drawn Notebook Feel */}
       <section style={styles.heroSection}>
         <div style={styles.heroBadge}>
-          <span>⭐️ THE SKETCH-TO-LAUNCH MEMEPAD ⭐️</span>
+          <span>⭐️ THE HAND-DRAWN SOLANA LAUNCHPAD ⭐️</span>
         </div>
         <h1 style={styles.mainTitle}>
-          Draw It. <span className="highlighter-tape">Mint It.</span> <span className="highlighter-tape-pink">Pump It.</span>
+          Draw it. <span className="highlighter-tape-cyan">Launch it.</span>
         </h1>
         <p style={styles.heroDescription}>
-          Doodle your coin on the paper, fill out the token info, and launch directly to <strong>pump.fun</strong> in seconds!
+          Doodle your coin on the canvas, fill in the details, and launch directly to <strong>pump.fun</strong> in seconds!
         </p>
       </section>
 
