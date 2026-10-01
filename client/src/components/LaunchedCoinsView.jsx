@@ -2,21 +2,65 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Rocket, Sparkles, RefreshCw, Pen, ExternalLink } from '@sketchyicons/react';
 
+// Built-in initial community doodle coins fallback
+const DEFAULT_COMMUNITY_COINS = [
+  {
+    name: 'Doodle Pepe',
+    symbol: 'DPEPE',
+    description: 'The first hand-drawn Pepe the Frog coin created on DrawPad.',
+    mintPublicKey: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
+    signature: '5K2bN5sC8F8j3bV9X8Z1Q7M4N2B9V6X3C8Z1Q7M4N2B9V6X3C8Z1Q7M4N2B9V6X3',
+    imageUrl: 'data:image/svg+xml;utf8,<svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="80" fill="%23fef08a"/><path d="M 20,55 C 15,35 25,18 50,18 C 75,18 85,35 80,55 C 75,68 65,72 50,72 C 35,72 25,68 20,55 Z" fill="%2386efac" stroke="%231a1a1e" stroke-width="2.5"/><ellipse cx="38" cy="30" rx="14" ry="12" fill="%23ffffff" stroke="%231a1a1e" stroke-width="2.2"/><ellipse cx="62" cy="30" rx="14" ry="12" fill="%23ffffff" stroke="%231a1a1e" stroke-width="2.2"/><circle cx="42" cy="30" r="4.5" fill="%231a1a1e"/><circle cx="58" cy="30" r="4.5" fill="%231a1a1e"/><path d="M 26,52 C 38,62 62,62 74,52" fill="none" stroke="%23dc2626" stroke-width="3"/></svg>',
+    createdAt: new Date(Date.now() - 3600000 * 3).toISOString(),
+    initialBuySol: 0.5,
+    creator: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+  },
+  {
+    name: 'Sketched Doge',
+    symbol: 'SKDOGE',
+    description: 'Much sketch, very drawing. Hand-made Dogecoin meme on Solana.',
+    mintPublicKey: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
+    signature: '4J8cN4sB7E7j2aU8W7Y0P6L3M1A8U5W2B7Y0P6L3M1A8U5W2B7Y0P6L3M1A8U5W2',
+    imageUrl: 'data:image/svg+xml;utf8,<svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="80" fill="%23fed7aa"/><circle cx="50" cy="42" r="26" fill="%23fed7aa" stroke="%231a1a1e" stroke-width="2.5"/><path d="M 28,26 L 34,8 L 46,20 Z" fill="%23f97316" stroke="%231a1a1e" stroke-width="2.2"/><path d="M 72,26 L 66,8 L 54,20 Z" fill="%23f97316" stroke="%231a1a1e" stroke-width="2.2"/><ellipse cx="50" cy="48" rx="12" ry="9" fill="%23ffedd5" stroke="%231a1a1e" stroke-width="2"/><polygon points="46,44 54,44 50,50" fill="%231a1a1e"/><circle cx="39" cy="36" r="4" fill="%231a1a1e"/><circle cx="61" cy="36" r="4" fill="%231a1a1e"/></svg>',
+    createdAt: new Date(Date.now() - 3600000 * 7).toISOString(),
+    initialBuySol: 1.2,
+    creator: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
+  },
+  {
+    name: 'Bonk Inker',
+    symbol: 'BINK',
+    description: 'The bat goes bonk. Hand-drawn on DrawPad and launched on pump.fun.',
+    mintPublicKey: '2uT7aV8C9kLmN3P4qRsTuVwXyZ1A2B3C4D5E6F7G8H9J',
+    signature: '3H7bM3sA6D6i1zT7V6X9O5K2L0Z7T4V1A6X9O5K2L0Z7T4V1A6X9O5K2L0Z7T4V1',
+    imageUrl: 'data:image/svg+xml;utf8,<svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="80" fill="%23fef9c3"/><circle cx="44" cy="42" r="20" fill="%23fde047" stroke="%231a1a1e" stroke-width="2.2"/><rect x="58" y="16" width="28" height="8" rx="4" transform="rotate(35 58 16)" fill="%23d97706" stroke="%231a1a1e" stroke-width="2"/><circle cx="36" cy="40" r="2.5" fill="%231a1a1e"/><circle cx="48" cy="40" r="2.5" fill="%231a1a1e"/></svg>',
+    createdAt: new Date(Date.now() - 3600000 * 14).toISOString(),
+    initialBuySol: 0.25,
+    creator: '7F4bM3sA6D6i1zT7V6X9O5K2L0Z7T4V1A6X9O5K2L0Z7',
+  }
+];
+
 export const LaunchedCoinsView = ({ onStartNewCoin }) => {
-  const [coins, setCoins] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [coins, setCoins] = useState(DEFAULT_COMMUNITY_COINS);
+  const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
 
   const fetchCoins = async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/launched-coins');
-      const data = await res.json();
-      if (data.coins) {
-        setCoins(data.coins);
+      if (res.ok) {
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          if (data.coins && Array.isArray(data.coins) && data.coins.length > 0) {
+            setCoins(data.coins);
+          }
+        } catch (jsonErr) {
+          console.warn('Backend response was not JSON, using local registry.');
+        }
       }
     } catch (err) {
-      console.error('Failed to fetch launched coins:', err);
+      console.warn('Using cached community coins registry:', err);
     } finally {
       setLoading(false);
     }

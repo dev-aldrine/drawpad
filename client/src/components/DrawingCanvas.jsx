@@ -490,12 +490,9 @@ const styles = {
   },
   studioLayout: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(320px, 480px) 1fr',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
     gap: '24px',
     alignItems: 'start',
-    '@media (max-width: 840px)': {
-      gridTemplateColumns: '1fr',
-    }
   },
   canvasOuter: {
     padding: '12px',
