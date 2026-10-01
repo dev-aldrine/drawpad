@@ -25,12 +25,17 @@ export default function TiltedCard({
 }) {
   const ref = useRef(null);
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useSpring(useMotionValue(0), springValues);
-  const rotateY = useSpring(useMotionValue(0), springValues);
-  const scale = useSpring(1, springValues);
-  const opacity = useSpring(0);
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const rawRotateX = useMotionValue(0);
+  const rawRotateY = useMotionValue(0);
+  const rawScale = useMotionValue(1);
+  const rawOpacity = useMotionValue(0);
+
+  const rotateX = useSpring(rawRotateX, springValues);
+  const rotateY = useSpring(rawRotateY, springValues);
+  const scale = useSpring(rawScale, springValues);
+  const opacity = useSpring(rawOpacity, { damping: 20, stiffness: 150 });
   const rotateFigcaption = useSpring(0, {
     stiffness: 350,
     damping: 30,
@@ -46,14 +51,14 @@ export default function TiltedCard({
     const offsetX = e.clientX - rect.left - rect.width / 2;
     const offsetY = e.clientY - rect.top - rect.height / 2;
 
-    const rotationX = (offsetY / (rect.height / 2)) * -rotateAmplitude;
-    const rotationY = (offsetX / (rect.width / 2)) * rotateAmplitude;
+    const rotX = (offsetY / (rect.height / 2)) * -rotateAmplitude;
+    const rotY = (offsetX / (rect.width / 2)) * rotateAmplitude;
 
-    rotateX.set(rotationX);
-    rotateY.set(rotationY);
+    rawRotateX.set(rotX);
+    rawRotateY.set(rotY);
 
-    x.set(e.clientX - rect.left);
-    y.set(e.clientY - rect.top);
+    rawX.set(e.clientX - rect.left + 12);
+    rawY.set(e.clientY - rect.top + 12);
 
     const velocityY = offsetY - lastY;
     rotateFigcaption.set(-velocityY * 0.6);
@@ -61,15 +66,15 @@ export default function TiltedCard({
   }
 
   function handleMouseEnter() {
-    scale.set(scaleOnHover);
-    opacity.set(1);
+    rawScale.set(scaleOnHover);
+    rawOpacity.set(1);
   }
 
   function handleMouseLeave() {
-    opacity.set(0);
-    scale.set(1);
-    rotateX.set(0);
-    rotateY.set(0);
+    rawOpacity.set(0);
+    rawScale.set(1);
+    rawRotateX.set(0);
+    rawRotateY.set(0);
     rotateFigcaption.set(0);
   }
 
@@ -118,8 +123,8 @@ export default function TiltedCard({
         <motion.figcaption
           className="tilted-card-caption"
           style={{
-            x,
-            y,
+            x: rawX,
+            y: rawY,
             opacity,
             rotate: rotateFigcaption
           }}
