@@ -531,11 +531,11 @@ app.post('/api/broadcast-tx', async (req, res) => {
 const CLIENT_DIST = path.join(__dirname, '../client/dist');
 if (fs.existsSync(CLIENT_DIST)) {
   app.use(express.static(CLIENT_DIST));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
-      return next();
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+      return res.sendFile(path.join(CLIENT_DIST, 'index.html'));
     }
-    res.sendFile(path.join(CLIENT_DIST, 'index.html'));
+    next();
   });
 }
 
