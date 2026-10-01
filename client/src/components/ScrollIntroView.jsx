@@ -12,22 +12,21 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
     offset: ['start start', 'end end']
   });
 
-  // Calculate active step: 0 (0-0.33), 1 (0.33-0.66), 2 (0.66-1.0)
-  // We use stepped opacity and transform ranges
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.28, 0.35], [1, 1, 0]);
-  const step1Scale = useTransform(scrollYProgress, [0, 0.28, 0.35], [1, 1, 0.9]);
-  const step1Y = useTransform(scrollYProgress, [0, 0.28, 0.35], [0, 0, -40]);
-  const step1RotateX = useTransform(scrollYProgress, [0, 0.28, 0.35], [0, 0, -25]);
+  // Calculate active step ranges with cleaner transitions
+  const step1Opacity = useTransform(scrollYProgress, [0, 0.22, 0.33], [1, 1, 0]);
+  const step1Scale = useTransform(scrollYProgress, [0, 0.22, 0.33], [1, 1, 0.92]);
+  const step1Y = useTransform(scrollYProgress, [0, 0.22, 0.33], [0, 0, -30]);
+  const step1RotateX = useTransform(scrollYProgress, [0, 0.22, 0.33], [0, 0, -15]);
 
-  const step2Opacity = useTransform(scrollYProgress, [0.32, 0.38, 0.62, 0.68], [0, 1, 1, 0]);
-  const step2Scale = useTransform(scrollYProgress, [0.32, 0.38, 0.62, 0.68], [0.88, 1, 1, 0.9]);
-  const step2Y = useTransform(scrollYProgress, [0.32, 0.38, 0.62, 0.68], [50, 0, 0, -40]);
-  const step2RotateX = useTransform(scrollYProgress, [0.32, 0.38, 0.62, 0.68], [30, 0, 0, -25]);
+  const step2Opacity = useTransform(scrollYProgress, [0.30, 0.38, 0.58, 0.66], [0, 1, 1, 0]);
+  const step2Scale = useTransform(scrollYProgress, [0.30, 0.38, 0.58, 0.66], [0.92, 1, 1, 0.92]);
+  const step2Y = useTransform(scrollYProgress, [0.30, 0.38, 0.58, 0.66], [30, 0, 0, -30]);
+  const step2RotateX = useTransform(scrollYProgress, [0.30, 0.38, 0.58, 0.66], [15, 0, 0, -15]);
 
-  const step3Opacity = useTransform(scrollYProgress, [0.65, 0.72, 1], [0, 1, 1]);
-  const step3Scale = useTransform(scrollYProgress, [0.65, 0.72, 1], [0.88, 1, 1]);
-  const step3Y = useTransform(scrollYProgress, [0.65, 0.72, 1], [50, 0, 0]);
-  const step3RotateX = useTransform(scrollYProgress, [0.65, 0.72, 1], [30, 0, 0]);
+  const step3Opacity = useTransform(scrollYProgress, [0.63, 0.72, 1], [0, 1, 1]);
+  const step3Scale = useTransform(scrollYProgress, [0.63, 0.72, 1], [0.92, 1, 1]);
+  const step3Y = useTransform(scrollYProgress, [0.63, 0.72, 1], [30, 0, 0]);
+  const step3RotateX = useTransform(scrollYProgress, [0.63, 0.72, 1], [15, 0, 0]);
 
   // Track progress bar percentage
   const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
