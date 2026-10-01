@@ -763,11 +763,13 @@ const styles = {
   },
   bottomHint: {
     marginTop: '16px',
-    fontSize: '14px',
-    color: '#64748b',
-    fontWeight: '600',
+    fontSize: '15px',
+    color: '#ffffff',
+    fontWeight: '700',
     fontFamily: 'var(--font-mono)',
     textAlign: 'center',
+    textShadow: '2px 2px 0px #000000, -1px -1px 0px #000000, 1px -1px 0px #000000, -1px 1px 0px #000000, 0px 2px 0px #000000, 2px 0px 0px #000000',
+    letterSpacing: '0.5px',
   },
 };
 
