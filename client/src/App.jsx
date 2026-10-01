@@ -4,7 +4,7 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { VersionedTransaction } from '@solana/web3.js';
 import confetti from 'canvas-confetti';
 import ClickSpark from './components/ClickSpark';
-import Cubes from './components/Cubes';
+import DriftWall from './components/DriftWall';
 import { BackgroundDoodles } from './components/BackgroundDoodles';
 import { StepNavigation } from './components/StepNavigation';
 import { ScrollIntroView } from './components/ScrollIntroView';
@@ -176,19 +176,25 @@ export function App() {
       duration={420}
     >
       <div style={styles.appWrapper}>
-        {/* Interactive 3D Cubes Grid Background */}
-        <div style={styles.cubesBackgroundWrapper} aria-hidden="true">
-          <Cubes 
-            gridSize={10}
-            maxAngle={55}
-            radius={4}
-            borderStyle="2px solid rgba(26, 26, 30, 0.28)"
-            faceColor="#f2e9d2"
-            rippleColor="#fde047"
-            rippleSpeed={2.2}
-            autoAnimate={true}
-            rippleOnClick={true}
-            shadow="0 2px 8px rgba(0,0,0,0.06)"
+        {/* Interactive 3D Drifting Meme Wall Background */}
+        <div style={styles.driftWallBackgroundWrapper} aria-hidden="true">
+          <DriftWall
+            columns={7}
+            tileWidth={175}
+            tileHeight={125}
+            gap={26}
+            tilt={14}
+            turn={-12}
+            perspective={2000}
+            depth={40}
+            speed={28}
+            direction="up"
+            variance={0.4}
+            parallax={0.4}
+            lift={36}
+            fade={0.35}
+            dim={0.72}
+            overlayColor="#fbf6ea"
           />
         </div>
 
@@ -311,18 +317,15 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
-  cubesBackgroundWrapper: {
+  driftWallBackgroundWrapper: {
     position: 'fixed',
     top: 0,
     left: 0,
     width: '100vw',
     height: '100vh',
     zIndex: 0,
-    opacity: 0.85,
+    opacity: 0.88,
     pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     overflow: 'hidden',
   },
   appContainer: {
