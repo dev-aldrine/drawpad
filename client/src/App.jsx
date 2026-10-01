@@ -12,6 +12,7 @@ import { DrawingCanvas } from './components/DrawingCanvas';
 import { TokenForm } from './components/TokenForm';
 import { LaunchedCoinsView } from './components/LaunchedCoinsView';
 import { SuccessModal } from './components/SuccessModal';
+import RubberSegment from './components/RubberSegment';
 import { Pen, Sparkles, BookOpen, Rocket, Coins } from '@sketchyicons/react';
 
 export function App() {
@@ -229,43 +230,42 @@ export function App() {
             </div>
 
             <div style={styles.navActions}>
-              <div style={styles.navTabs}>
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(1)}
-                  style={{
-                    ...styles.navTabBtn,
-                    background: currentStep === 1 ? 'var(--marker-yellow)' : 'transparent',
-                    borderColor: currentStep === 1 ? '#1a1a1e' : 'transparent',
-                  }}
-                >
-                  <span>How It Works</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(2)}
-                  style={{
-                    ...styles.navTabBtn,
-                    background: (currentStep === 2 || currentStep === 3) ? 'var(--marker-green)' : 'transparent',
-                    borderColor: (currentStep === 2 || currentStep === 3) ? '#1a1a1e' : 'transparent',
-                  }}
-                >
-                  <span>Launchpad Studio</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(4)}
-                  style={{
-                    ...styles.navTabBtn,
-                    background: currentStep === 4 ? 'var(--marker-cyan)' : 'transparent',
-                    borderColor: currentStep === 4 ? '#1a1a1e' : 'transparent',
-                  }}
-                >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <Coins size={15} /> Launched Coins
-                  </span>
-                </button>
-              </div>
+              <RubberSegment
+                items={[
+                  { value: 'how-it-works', label: 'How It Works' },
+                  { value: 'studio', label: 'Launchpad Studio' },
+                  {
+                    value: 'launched-coins',
+                    label: 'Launched Coins',
+                    icon: <Coins size={15} />
+                  }
+                ]}
+                value={
+                  currentStep === 1
+                    ? 'how-it-works'
+                    : currentStep === 4
+                    ? 'launched-coins'
+                    : 'studio'
+                }
+                onChange={(val) => {
+                  if (val === 'how-it-works') setCurrentStep(1);
+                  else if (val === 'launched-coins') setCurrentStep(4);
+                  else setCurrentStep(2);
+                }}
+                trackColor="#f8fafc"
+                thumbColor="#fef08a"
+                textColor="#64748b"
+                activeTextColor="#1a1a1e"
+                size="md"
+                radius={10}
+                inset={3}
+                equalSlots={false}
+                stretch={100}
+                squash={3}
+                speed={1}
+                glide={75}
+                draggable
+              />
 
               <WalletMultiButton />
             </div>
