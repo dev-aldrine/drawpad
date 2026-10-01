@@ -3,6 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { VersionedTransaction } from '@solana/web3.js';
 import confetti from 'canvas-confetti';
+import Cubes from './components/Cubes';
 import { BackgroundDoodles } from './components/BackgroundDoodles';
 import { StepNavigation } from './components/StepNavigation';
 import { IntroView } from './components/IntroView';
@@ -166,98 +167,135 @@ export function App() {
   };
 
   return (
-    <div style={styles.appContainer}>
-      {/* Background Doodles Everywhere */}
+    <div style={styles.appWrapper}>
+      {/* Interactive Cubes Grid Background */}
+      <div style={styles.cubesBackgroundWrapper} aria-hidden="true">
+        <Cubes 
+          gridSize={12}
+          maxAngle={50}
+          radius={4}
+          borderStyle="1.5px solid rgba(26, 26, 30, 0.12)"
+          faceColor="#f7f1e1"
+          rippleColor="#fde047"
+          rippleSpeed={1.8}
+          autoAnimate={true}
+          rippleOnClick={true}
+        />
+      </div>
+
+      {/* Background Floating Doodles */}
       <BackgroundDoodles />
 
-      {/* Navigation Bar */}
-      <header style={styles.navbar} className="sketch-card">
-        <div style={styles.logoGroup} onClick={() => setCurrentStep(1)} style={{ cursor: 'pointer', ...styles.logoGroup }}>
-          <div style={styles.logoIcon}>
-            <Pen size={22} />
-          </div>
-          <div>
-            <div style={styles.brandTitle}>
-              Draw<span className="highlighter-tape-cyan">Pad</span>
+      {/* Foreground Main Container */}
+      <div style={styles.appContainer}>
+        {/* Navigation Bar */}
+        <header style={styles.navbar} className="sketch-card">
+          <div style={styles.logoGroup} onClick={() => setCurrentStep(1)} style={{ cursor: 'pointer', ...styles.logoGroup }}>
+            <div style={styles.logoIcon}>
+              <Pen size={22} />
             </div>
-            <div style={styles.brandSubtitle}>Hand-drawn coins on pump.fun</div>
+            <div>
+              <div style={styles.brandTitle}>
+                Draw<span className="highlighter-tape-cyan">Pad</span>
+              </div>
+              <div style={styles.brandSubtitle}>Hand-drawn coins on pump.fun</div>
+            </div>
           </div>
-        </div>
 
-        <div style={styles.navActions}>
-          <div style={styles.networkBadge}>
-            <span style={styles.activeDot}></span>
-            <span>Solana Mainnet</span>
+          <div style={styles.navActions}>
+            <div style={styles.networkBadge}>
+              <span style={styles.activeDot}></span>
+              <span>Solana Mainnet</span>
+            </div>
+            <WalletMultiButton />
           </div>
-          <WalletMultiButton />
-        </div>
-      </header>
+        </header>
 
-      {/* Hero Header */}
-      <section style={styles.heroSection}>
-        <div style={styles.heroBadge}>
-          <Sparkles size={14} />
-          <span>THE HAND-DRAWN SOLANA LAUNCHPAD</span>
-        </div>
-        <h1 style={styles.mainTitle}>
-          Draw it. <span className="highlighter-tape-cyan">Launch it.</span>
-        </h1>
-      </section>
+        {/* Hero Header */}
+        <section style={styles.heroSection}>
+          <div style={styles.heroBadge}>
+            <Sparkles size={14} />
+            <span>THE HAND-DRAWN SOLANA LAUNCHPAD</span>
+          </div>
+          <h1 style={styles.mainTitle}>
+            Draw it. <span className="highlighter-tape-cyan">Launch it.</span>
+          </h1>
+        </section>
 
-      {/* Step Wizard Navigation Header */}
-      <StepNavigation
-        currentStep={currentStep}
-        onStepChange={(step) => setCurrentStep(step)}
-        canProceedToStep2={true}
-        canProceedToStep3={!!imageDataUrl}
-      />
-
-      {/* Wizard Content Views */}
-      <main style={styles.wizardMain}>
-        {/* STEP 1: Intro / How It Works */}
-        {currentStep === 1 && (
-          <IntroView onProceed={() => setCurrentStep(2)} />
-        )}
-
-        {/* STEP 2: Dedicated Canvas Studio */}
-        {currentStep === 2 && (
-          <DrawingCanvas
-            initialImage={imageDataUrl}
-            onImageExport={(dataUrl) => setImageDataUrl(dataUrl)}
-            onNext={() => setCurrentStep(3)}
-            onBack={() => setCurrentStep(1)}
-          />
-        )}
-
-        {/* STEP 3: Dedicated Token Information & Launch Form */}
-        {currentStep === 3 && (
-          <TokenForm
-            formData={formData}
-            onChange={handleFormChange}
-            onLaunch={handleLaunch}
-            onBack={() => setCurrentStep(2)}
-            onEditArtwork={() => setCurrentStep(2)}
-            previewImage={imageDataUrl}
-            loading={loading}
-            statusMessage={statusMessage}
-            isWalletConnected={connected}
-          />
-        )}
-      </main>
-
-      {/* Success Launch Modal */}
-      {successData && (
-        <SuccessModal
-          data={successData}
-          onClose={() => setSuccessData(null)}
-          onReset={handleReset}
+        {/* Step Wizard Navigation Header */}
+        <StepNavigation
+          currentStep={currentStep}
+          onStepChange={(step) => setCurrentStep(step)}
+          canProceedToStep2={true}
+          canProceedToStep3={!!imageDataUrl}
         />
-      )}
+
+        {/* Wizard Content Views */}
+        <main style={styles.wizardMain}>
+          {/* STEP 1: Intro / How It Works */}
+          {currentStep === 1 && (
+            <IntroView onProceed={() => setCurrentStep(2)} />
+          )}
+
+          {/* STEP 2: Dedicated Canvas Studio */}
+          {currentStep === 2 && (
+            <DrawingCanvas
+              initialImage={imageDataUrl}
+              onImageExport={(dataUrl) => setImageDataUrl(dataUrl)}
+              onNext={() => setCurrentStep(3)}
+              onBack={() => setCurrentStep(1)}
+            />
+          )}
+
+          {/* STEP 3: Dedicated Token Information & Launch Form */}
+          {currentStep === 3 && (
+            <TokenForm
+              formData={formData}
+              onChange={handleFormChange}
+              onLaunch={handleLaunch}
+              onBack={() => setCurrentStep(2)}
+              onEditArtwork={() => setCurrentStep(2)}
+              previewImage={imageDataUrl}
+              loading={loading}
+              statusMessage={statusMessage}
+              isWalletConnected={connected}
+            />
+          )}
+        </main>
+
+        {/* Success Launch Modal */}
+        {successData && (
+          <SuccessModal
+            data={successData}
+            onClose={() => setSuccessData(null)}
+            onReset={handleReset}
+          />
+        )}
+      </div>
     </div>
   );
 }
 
 const styles = {
+  appWrapper: {
+    position: 'relative',
+    minHeight: '100vh',
+    width: '100%',
+    overflow: 'hidden',
+  },
+  cubesBackgroundWrapper: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: 0,
+    opacity: 0.65,
+    pointerEvents: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   appContainer: {
     maxWidth: '1080px',
     margin: '0 auto',
@@ -267,7 +305,7 @@ const styles = {
     gap: '20px',
     width: '100%',
     position: 'relative',
-    zIndex: 1,
+    zIndex: 2,
   },
   navbar: {
     display: 'flex',
