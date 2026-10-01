@@ -88,17 +88,22 @@ const DriftWall = ({
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
+  // Distribute all 11 pictures across columns using rotational permutations so:
+  // 1. Every column contains all unique images
+  // 2. No picture appears adjacent or repeats in the same column
   const columnItems = useMemo(() => {
-    const cols = Array.from({ length: columns }, () => []);
-    items.forEach((item, i) => cols[i % columns].push(item));
-    return cols.map(col => (col.length ? col : items.slice(0, 1)));
+    return Array.from({ length: columns }, (_, c) => {
+      // Shift each column by (c * 3) to give distinct ordering and varied starting points
+      const offset = (c * 3) % items.length;
+      return items.map((_, i) => items[(i + offset) % items.length]);
+    });
   }, [items, columns]);
 
   const columnMeta = useMemo(() => {
     const unit = tileHeight + gap;
     return columnItems.map(col => {
-      const copyHeight = Math.max(unit, col.length * unit);
-      const copies = Math.max(3, Math.ceil((containerHeight * 3.5) / copyHeight) + 2);
+      const copyHeight = col.length * unit;
+      const copies = Math.max(2, Math.ceil((containerHeight * 3) / copyHeight) + 1);
       return { copyHeight, copies };
     });
   }, [columnItems, tileHeight, gap, containerHeight]);
