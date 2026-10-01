@@ -1,0 +1,17 @@
+{
+  "name": "drawpad-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DrawPad - Draw and Launch on pump.fun",
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm run server\" \"npm run client\"",
+    "start": "npm run dev",
+    "build": "cd client && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

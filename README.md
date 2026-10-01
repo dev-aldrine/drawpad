@@ -30,21 +30,13 @@
 - Node.js (v18+)
 - Phantom Wallet browser extension installed and set to Solana Mainnet with some SOL balance (for launch transaction fees & initial buy).
 
-### 2. Run the Backend Server
+### 2. Run the Entire Project (Server + Client)
+From the root directory:
 ```bash
-cd server
-npm install
-npm start
-```
-Server runs at `http://localhost:5001`.
-
-### 3. Run the React Client
-```bash
-cd client
-npm install
 npm run dev
 ```
-Client runs at `http://localhost:5173`.
+- **React Frontend**: `http://localhost:5173`
+- **Express Backend**: `http://localhost:5001`
 
 ---
 
