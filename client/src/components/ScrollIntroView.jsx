@@ -1,99 +1,37 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { Pen, Coins, Rocket, Check, ChevronDown, Sparkles } from '@sketchyicons/react';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { Pen, Coins, Rocket, Check, ChevronDown, ArrowDown } from '@sketchyicons/react';
 import RotatingText from './RotatingText';
 
-// Scroll-Driven Step Item that unfolds precisely based on scroll position
-const ScrollDrivenStep = ({ step, index, total }) => {
-  const targetRef = useRef(null);
-  
-  // Track scroll progress of this specific section
+export const ScrollIntroView = ({ onLaunchNow }) => {
+  const containerRef = useRef(null);
+
+  // Track scroll through the pinned sticky section (300vh track for 3 steps)
   const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ['start end', 'center center'],
+    target: containerRef,
+    offset: ['start start', 'end end']
   });
 
-  // Smooth spring physics for fluid interpolation
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 25, restDelta: 0.001 });
+  // Calculate active step: 0 (0-0.33), 1 (0.33-0.66), 2 (0.66-1.0)
+  // We use stepped opacity and transform ranges
+  const step1Opacity = useTransform(scrollYProgress, [0, 0.28, 0.35], [1, 1, 0]);
+  const step1Scale = useTransform(scrollYProgress, [0, 0.28, 0.35], [1, 1, 0.9]);
+  const step1Y = useTransform(scrollYProgress, [0, 0.28, 0.35], [0, 0, -40]);
+  const step1RotateX = useTransform(scrollYProgress, [0, 0.28, 0.35], [0, 0, -25]);
 
-  // 3D Unfold Transformations driven directly by scroll position:
-  // 1. rotateX: starts folded back at 45deg, unfolds flat to 0deg
-  const rotateX = useTransform(smoothProgress, [0, 1], [40, 0]);
-  // 2. rotateY: subtle organic paper tilt
-  const rotateY = useTransform(smoothProgress, [0, 1], [index % 2 === 0 ? -12 : 12, 0]);
-  // 3. scale: unfolds from 0.82 to full size 1.0
-  const scale = useTransform(smoothProgress, [0, 1], [0.85, 1]);
-  // 4. opacity: fades in from 0 to 1
-  const opacity = useTransform(smoothProgress, [0, 0.4, 1], [0.1, 0.7, 1]);
-  // 5. y: slides up gracefully
-  const y = useTransform(smoothProgress, [0, 1], [80, 0]);
-  // 6. badge scale spring
-  const badgeScale = useTransform(smoothProgress, [0, 0.6, 1], [0.4, 1.15, 1]);
+  const step2Opacity = useTransform(scrollYProgress, [0.32, 0.38, 0.62, 0.68], [0, 1, 1, 0]);
+  const step2Scale = useTransform(scrollYProgress, [0.32, 0.38, 0.62, 0.68], [0.88, 1, 1, 0.9]);
+  const step2Y = useTransform(scrollYProgress, [0.32, 0.38, 0.62, 0.68], [50, 0, 0, -40]);
+  const step2RotateX = useTransform(scrollYProgress, [0.32, 0.38, 0.62, 0.68], [30, 0, 0, -25]);
 
-  return (
-    <div ref={targetRef} style={styles.scrollStepContainer}>
-      <div style={styles.timelineItem}>
-        {/* Timeline Node with Scroll-driven Scale */}
-        <div style={styles.timelineNodeCol}>
-          <motion.div 
-            style={{ 
-              ...styles.timelineNodeBadge, 
-              background: step.color,
-              scale: badgeScale,
-            }}
-          >
-            {step.num}
-          </motion.div>
-          {index < total - 1 && <div style={styles.timelineLine} />}
-        </div>
+  const step3Opacity = useTransform(scrollYProgress, [0.65, 0.72, 1], [0, 1, 1]);
+  const step3Scale = useTransform(scrollYProgress, [0.65, 0.72, 1], [0.88, 1, 1]);
+  const step3Y = useTransform(scrollYProgress, [0.65, 0.72, 1], [50, 0, 0]);
+  const step3RotateX = useTransform(scrollYProgress, [0.65, 0.72, 1], [30, 0, 0]);
 
-        {/* 3D Unfolding Card */}
-        <div style={styles.stepCardWrap}>
-          <motion.div
-            style={{
-              perspective: 1200,
-              transformStyle: 'preserve-3d',
-              rotateX,
-              rotateY,
-              scale,
-              opacity,
-              y,
-            }}
-          >
-            <div style={styles.stepCard} className="sketch-card">
-              <div style={{ ...styles.cardTape, background: step.tapeColor }}>
-                <span>{step.badge}</span>
-              </div>
+  // Track progress bar percentage
+  const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
-              <div style={styles.cardHeader}>
-                <div>
-                  <h2 style={styles.cardTitle}>{step.title}</h2>
-                  <span style={styles.cardSubtitle}>{step.subtitle}</span>
-                </div>
-              </div>
-
-              <p style={styles.cardDesc}>{step.desc}</p>
-
-              {/* Highlights list */}
-              <div style={styles.highlightsBox}>
-                {step.highlights.map((h, i) => (
-                  <div key={i} style={styles.highlightRow}>
-                    <div style={styles.checkIconWrap}>
-                      <Check size={14} />
-                    </div>
-                    <span style={styles.highlightText}>{h}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export const ScrollIntroView = ({ onLaunchNow }) => {
   const steps = [
     {
       num: '01',
@@ -104,6 +42,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
       badge: 'Step 1 • Canvas Studio',
       color: 'var(--marker-yellow)',
       tapeColor: '#fef08a',
+      icon: <Pen size={32} />
     },
     {
       num: '02',
@@ -114,6 +53,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
       badge: 'Step 2 • Launch Specs',
       color: 'var(--marker-green)',
       tapeColor: '#bbf7d0',
+      icon: <Coins size={32} />
     },
     {
       num: '03',
@@ -124,6 +64,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
       badge: 'Step 3 • Live Launch',
       color: 'var(--marker-cyan)',
       tapeColor: '#bae6fd',
+      icon: <Rocket size={32} />
     },
   ];
 
@@ -183,34 +124,144 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
           </span>
         </h1>
         <p style={styles.heroDesc}>
-          Turn rough sketches into real live Solana tokens on <strong>pump.fun</strong> in 3 interactive steps. Scroll down to watch each step 3D unfold in real-time.
+          Turn rough sketches into live Solana tokens on <strong>pump.fun</strong>. Scroll down to step through each phase 1 by 1.
         </p>
 
-        <div style={styles.heroCtaGroup}>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            type="button"
-            onClick={onLaunchNow}
-            className="sketch-btn sketch-btn-green"
-            style={styles.heroLaunchBtn}
-          >
-            <Pen size={20} />
-            <span>Launch a Coin Now</span>
-          </motion.button>
+        <div style={styles.scrollDownIndicator}>
+          <span>Scroll down to step through</span>
+          <motion.div animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+            <ArrowDown size={18} />
+          </motion.div>
         </div>
       </motion.section>
 
-      {/* Scroll-Driven Unfolding Steps Timeline */}
-      <div style={styles.stepsTimeline}>
-        {steps.map((step, idx) => (
-          <ScrollDrivenStep 
-            key={idx} 
-            step={step} 
-            index={idx} 
-            total={steps.length} 
-          />
-        ))}
+      {/* PINNED STICKY 1-BY-1 SCROLL TRACK (300vh height track) */}
+      <div ref={containerRef} style={styles.stickyTrackWrapper}>
+        <div style={styles.stickyWindow}>
+          {/* Progress Tracker Bar */}
+          <div style={styles.progressBarTrack}>
+            <motion.div style={{ ...styles.progressBarFill, width: progressBarWidth }} />
+          </div>
+
+          <div style={styles.stepPresenter}>
+            {/* STEP 1 CARD */}
+            <motion.div 
+              style={{
+                ...styles.stepCardAbsolute,
+                opacity: step1Opacity,
+                scale: step1Scale,
+                y: step1Y,
+                rotateX: step1RotateX,
+                pointerEvents: 'auto'
+              }}
+            >
+              <div style={styles.stepCard} className="sketch-card">
+                <div style={{ ...styles.cardTape, background: steps[0].tapeColor }}>
+                  <span>{steps[0].badge}</span>
+                </div>
+
+                <div style={styles.cardHeader}>
+                  <div style={{ ...styles.stepIconBox, background: steps[0].color }}>
+                    {steps[0].icon}
+                  </div>
+                  <div>
+                    <h2 style={styles.cardTitle}>{steps[0].title}</h2>
+                    <span style={styles.cardSubtitle}>{steps[0].subtitle}</span>
+                  </div>
+                </div>
+
+                <p style={styles.cardDesc}>{steps[0].desc}</p>
+
+                <div style={styles.highlightsBox}>
+                  {steps[0].highlights.map((h, i) => (
+                    <div key={i} style={styles.highlightRow}>
+                      <div style={styles.checkIconWrap}><Check size={14} /></div>
+                      <span style={styles.highlightText}>{h}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* STEP 2 CARD */}
+            <motion.div 
+              style={{
+                ...styles.stepCardAbsolute,
+                opacity: step2Opacity,
+                scale: step2Scale,
+                y: step2Y,
+                rotateX: step2RotateX,
+                pointerEvents: 'auto'
+              }}
+            >
+              <div style={styles.stepCard} className="sketch-card">
+                <div style={{ ...styles.cardTape, background: steps[1].tapeColor }}>
+                  <span>{steps[1].badge}</span>
+                </div>
+
+                <div style={styles.cardHeader}>
+                  <div style={{ ...styles.stepIconBox, background: steps[1].color }}>
+                    {steps[1].icon}
+                  </div>
+                  <div>
+                    <h2 style={styles.cardTitle}>{steps[1].title}</h2>
+                    <span style={styles.cardSubtitle}>{steps[1].subtitle}</span>
+                  </div>
+                </div>
+
+                <p style={styles.cardDesc}>{steps[1].desc}</p>
+
+                <div style={styles.highlightsBox}>
+                  {steps[1].highlights.map((h, i) => (
+                    <div key={i} style={styles.highlightRow}>
+                      <div style={styles.checkIconWrap}><Check size={14} /></div>
+                      <span style={styles.highlightText}>{h}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* STEP 3 CARD */}
+            <motion.div 
+              style={{
+                ...styles.stepCardAbsolute,
+                opacity: step3Opacity,
+                scale: step3Scale,
+                y: step3Y,
+                rotateX: step3RotateX,
+                pointerEvents: 'auto'
+              }}
+            >
+              <div style={styles.stepCard} className="sketch-card">
+                <div style={{ ...styles.cardTape, background: steps[2].tapeColor }}>
+                  <span>{steps[2].badge}</span>
+                </div>
+
+                <div style={styles.cardHeader}>
+                  <div style={{ ...styles.stepIconBox, background: steps[2].color }}>
+                    {steps[2].icon}
+                  </div>
+                  <div>
+                    <h2 style={styles.cardTitle}>{steps[2].title}</h2>
+                    <span style={styles.cardSubtitle}>{steps[2].subtitle}</span>
+                  </div>
+                </div>
+
+                <p style={styles.cardDesc}>{steps[2].desc}</p>
+
+                <div style={styles.highlightsBox}>
+                  {steps[2].highlights.map((h, i) => (
+                    <div key={i} style={styles.highlightRow}>
+                      <div style={styles.checkIconWrap}><Check size={14} /></div>
+                      <span style={styles.highlightText}>{h}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* Interactive FAQ Accordion Section */}
@@ -334,102 +385,119 @@ const styles = {
     maxWidth: '620px',
     lineHeight: '1.45',
   },
-  heroCtaGroup: {
-    marginTop: '10px',
-  },
-  heroLaunchBtn: {
-    padding: '14px 32px',
-    fontSize: '20px',
-  },
-  stepsTimeline: {
+  scrollDownIndicator: {
     display: 'flex',
-    flexDirection: 'column',
-    gap: '48px',
-    position: 'relative',
-    padding: '10px 0',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '15px',
+    fontWeight: '700',
+    color: '#1a1a1e',
+    background: '#f8fafc',
+    border: '1.5px solid #1a1a1e',
+    borderRadius: '20px',
+    padding: '6px 16px',
+    marginTop: '6px',
   },
-  scrollStepContainer: {
+  /* 300vh sticky scroll presenter */
+  stickyTrackWrapper: {
+    position: 'relative',
+    height: '240vh',
     width: '100%',
   },
-  timelineItem: {
-    display: 'flex',
-    gap: '24px',
-    alignItems: 'stretch',
-  },
-  timelineNodeCol: {
+  stickyWindow: {
+    position: 'sticky',
+    top: '120px',
+    height: '520px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '54px',
-    flexShrink: 0,
+    justifyContent: 'center',
+    perspective: '1200px',
   },
-  timelineNodeBadge: {
-    width: '52px',
-    height: '52px',
-    borderRadius: '14px',
-    border: '2.5px solid #1a1a1e',
+  progressBarTrack: {
+    width: '260px',
+    height: '8px',
+    background: '#e2e8f0',
+    border: '1.5px solid #1a1a1e',
+    borderRadius: '6px',
+    marginBottom: '20px',
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    background: '#10b981',
+    borderRadius: '4px',
+  },
+  stepPresenter: {
+    position: 'relative',
+    width: '100%',
+    maxWidth: '720px',
+    height: '420px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontFamily: 'var(--font-heading)',
-    fontSize: '22px',
-    fontWeight: '800',
-    color: '#1a1a1e',
-    boxShadow: '2.5px 2.5px 0px #1a1a1e',
-    zIndex: 2,
   },
-  timelineLine: {
-    flex: 1,
-    width: '3px',
-    borderLeft: '3px dashed #1a1a1e',
-    margin: '10px 0',
-  },
-  stepCardWrap: {
-    flex: 1,
+  stepCardAbsolute: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    transformStyle: 'preserve-3d',
   },
   stepCard: {
-    padding: '30px 26px',
+    padding: '34px 28px',
     backgroundColor: '#ffffff',
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
-    gap: '14px',
+    gap: '16px',
     boxShadow: '4px 4px 0px #1a1a1e',
   },
   cardTape: {
     position: 'absolute',
     top: '-12px',
-    left: '20px',
+    left: '24px',
     border: '1.5px dashed #1a1a1e',
-    padding: '2px 12px',
+    padding: '3px 14px',
     fontFamily: 'var(--font-mono)',
-    fontSize: '11px',
+    fontSize: '12px',
     fontWeight: '700',
     color: '#1a1a1e',
   },
   cardHeader: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: '4px',
+    gap: '16px',
+    marginTop: '6px',
+  },
+  stepIconBox: {
+    width: '56px',
+    height: '56px',
+    borderRadius: '12px',
+    border: '2px solid #1a1a1e',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '2px 2px 0px #1a1a1e',
+    flexShrink: 0,
   },
   cardTitle: {
-    fontSize: '26px',
+    fontSize: '28px',
     fontWeight: '800',
     color: '#1a1a1e',
     fontFamily: 'var(--font-heading)',
     lineHeight: '1.2',
   },
   cardSubtitle: {
-    fontSize: '14px',
+    fontSize: '15px',
     fontWeight: '700',
     color: '#64748b',
     fontFamily: 'var(--font-mono)',
   },
   cardDesc: {
-    fontSize: '17px',
+    fontSize: '18px',
     color: '#475569',
-    lineHeight: '1.45',
+    lineHeight: '1.5',
   },
   highlightsBox: {
     display: 'flex',
@@ -438,8 +506,7 @@ const styles = {
     background: '#f8fafc',
     border: '1.5px dashed #cbd5e1',
     borderRadius: '10px',
-    padding: '12px 16px',
-    marginTop: '4px',
+    padding: '14px 18px',
   },
   highlightRow: {
     display: 'flex',
@@ -450,8 +517,8 @@ const styles = {
     background: '#bbf7d0',
     border: '1.5px solid #1a1a1e',
     borderRadius: '50%',
-    width: '20px',
-    height: '20px',
+    width: '22px',
+    height: '22px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -459,7 +526,7 @@ const styles = {
     flexShrink: 0,
   },
   highlightText: {
-    fontSize: '15px',
+    fontSize: '16px',
     fontWeight: '600',
     color: '#1e293b',
   },
@@ -470,6 +537,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '18px',
+    marginTop: '20px',
   },
   tapeFaq: {
     position: 'absolute',
