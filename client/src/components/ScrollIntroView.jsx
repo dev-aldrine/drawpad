@@ -4,18 +4,18 @@ import { Pen, Coins, Rocket, Check, ArrowDown, ArrowUp, ChevronDown, Sparkles } 
 import RotatingText from './RotatingText';
 import BounceCards from './BounceCards';
 
-import pepeImg from '../../draw/pepe.jpeg';
 import dogeImg from '../../draw/doge.jpeg';
 import spodermanImg from '../../draw/spoderman.jpeg';
 import dogwiphapImg from '../../draw/dogwiphap.jpeg';
 import trompImg from '../../draw/tromp.jpeg';
+import solonoImg from '../../draw/solono.png';
 
 const BOUNCE_IMAGES = [
-  pepeImg,
   dogeImg,
   spodermanImg,
   dogwiphapImg,
-  trompImg
+  trompImg,
+  solonoImg
 ];
 
 const BOUNCE_TRANSFORMS = [
@@ -332,7 +332,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                       animationStagger={0.06}
                       easeType="elastic.out(1, 0.6)"
                       transformStyles={BOUNCE_TRANSFORMS}
-                      enableHover={true}
+                      enableHover={false}
                     />
                   </div>
                 </div>

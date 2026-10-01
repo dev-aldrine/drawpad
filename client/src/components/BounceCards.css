@@ -16,12 +16,7 @@
   overflow: hidden;
   background: #ffffff;
   box-shadow: 3px 3px 0px #1a1a1e;
-  transition: box-shadow 0.2s ease;
-}
-
-.bounceCardsContainer .card:hover {
-  box-shadow: 5px 5px 0px #1a1a1e;
-  z-index: 10;
+  pointer-events: none;
 }
 
 .bounceCardsContainer .card .image {
