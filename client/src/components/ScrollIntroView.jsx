@@ -27,11 +27,8 @@ const BOUNCE_TRANSFORMS = [
   'rotate(2deg) translate(140px)'
 ];
 
-import { MotionDoodleShowcase } from './MotionDoodleShowcase';
-
 export const ScrollIntroView = ({ onLaunchNow }) => {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [showMotionGraphic, setShowMotionGraphic] = useState(false);
   const isTransitioningRef = useRef(false);
   const touchStartYRef = useRef(0);
 
@@ -225,7 +222,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
       {/* Main Single-Screen Slide Container */}
       <div style={styles.slideDisplayBox}>
         <AnimatePresence mode="wait" custom={1}>
-          {/* SLIDE 0: HERO INTRO / MOTION SHOWCASE */}
+          {/* SLIDE 0: HERO INTRO */}
           {activeSlide === 0 && (
             <motion.div
               key="slide-0"
@@ -236,82 +233,57 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
               exit="exit"
               style={styles.cardContainer}
             >
-              {showMotionGraphic ? (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setShowMotionGraphic(false)}
-                      className="sketch-btn"
-                      style={{ padding: '6px 14px', fontSize: '14px', background: '#ffffff' }}
-                    >
-                      <span>← Back to Overview</span>
-                    </button>
-                  </div>
-                  <MotionDoodleShowcase onDrawYourOwn={onLaunchNow} />
+              <div style={styles.slideCard} className="sketch-card">
+                <div style={styles.tapeTop}>
+                  <span>DRAWPAD • HOW IT WORKS</span>
                 </div>
-              ) : (
-                <div style={styles.slideCard} className="sketch-card">
-                  <div style={styles.tapeTop}>
-                    <span>DRAWPAD • HOW IT WORKS</span>
-                  </div>
 
-                  <div style={styles.heroLogoWrap}>
-                    <img src={logoImg} alt="DrawPad Pencil Logo" style={styles.heroLogoImg} />
-                  </div>
-
-                  <h1 style={styles.mainTitle}>
-                    Draw it.{' '}
-                    <span className="highlighter-tape-cyan" style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
-                      <RotatingText
-                        texts={['Launch it.', 'Pump it.', 'Trade it.', 'Meme it.']}
-                        mainClassName="justify-center"
-                        staggerFrom="last"
-                        initial={{ y: '100%', opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: '-120%', opacity: 0 }}
-                        staggerDuration={0.03}
-                        transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                        rotationInterval={2400}
-                      />
-                    </span>
-                  </h1>
-
-                  <p style={styles.heroDesc}>
-                    Turn rough sketches into live Solana tokens on <strong>pump.fun</strong> for only <strong>0.02 SOL</strong> protocol fee (no mandatory dev buy required). All launch fees fund the main DrawPad ecosystem buyback pool.
-                  </p>
-
-                  <div style={styles.slideActionsRow}>
-                    <button
-                      type="button"
-                      onClick={() => setShowMotionGraphic(true)}
-                      className="sketch-btn"
-                      style={{ ...styles.actionBtn, background: '#fef08a' }}
-                    >
-                      <Sparkles size={18} />
-                      <span>Watch Graphic Motion</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={nextSlide}
-                      className="sketch-btn sketch-btn-green"
-                      style={styles.actionBtn}
-                    >
-                      <span>Explore Steps</span>
-                      <ArrowDown size={18} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={onLaunchNow}
-                      className="sketch-btn"
-                      style={{ ...styles.actionBtn, background: 'var(--marker-cyan)' }}
-                    >
-                      <Rocket size={18} />
-                      <span>Skip to Studio</span>
-                    </button>
-                  </div>
+                <div style={styles.heroLogoWrap}>
+                  <img src={logoImg} alt="DrawPad Pencil Logo" style={styles.heroLogoImg} />
                 </div>
-              )}
+
+                <h1 style={styles.mainTitle}>
+                  Draw it.{' '}
+                  <span className="highlighter-tape-cyan" style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
+                    <RotatingText
+                      texts={['Launch it.', 'Pump it.', 'Trade it.', 'Meme it.']}
+                      mainClassName="justify-center"
+                      staggerFrom="last"
+                      initial={{ y: '100%', opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: '-120%', opacity: 0 }}
+                      staggerDuration={0.03}
+                      transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                      rotationInterval={2400}
+                    />
+                  </span>
+                </h1>
+
+                <p style={styles.heroDesc}>
+                  Turn rough sketches into live Solana tokens on <strong>pump.fun</strong> for only <strong>0.02 SOL</strong> protocol fee (no mandatory dev buy required). All launch fees fund the main DrawPad ecosystem buyback pool.
+                </p>
+
+                <div style={styles.slideActionsRow}>
+                  <button
+                    type="button"
+                    onClick={nextSlide}
+                    className="sketch-btn sketch-btn-green"
+                    style={styles.actionBtn}
+                  >
+                    <span>Explore Steps (Scroll Down)</span>
+                    <ArrowDown size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onLaunchNow}
+                    className="sketch-btn"
+                    style={{ ...styles.actionBtn, background: 'var(--marker-cyan)' }}
+                  >
+                    <Rocket size={18} />
+                    <span>Skip to Studio</span>
+                  </button>
+                </div>
+              </div>
             </motion.div>
           )}
 
