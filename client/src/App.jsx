@@ -3,6 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { VersionedTransaction } from '@solana/web3.js';
 import confetti from 'canvas-confetti';
+import ClickSpark from './components/ClickSpark';
 import Cubes from './components/Cubes';
 import { BackgroundDoodles } from './components/BackgroundDoodles';
 import { StepNavigation } from './components/StepNavigation';
@@ -167,129 +168,137 @@ export function App() {
   };
 
   return (
-    <div style={styles.appWrapper}>
-      {/* Interactive 3D Cubes Grid Background */}
-      <div style={styles.cubesBackgroundWrapper} aria-hidden="true">
-        <Cubes 
-          gridSize={10}
-          maxAngle={55}
-          radius={4}
-          borderStyle="2px solid rgba(26, 26, 30, 0.28)"
-          faceColor="#f2e9d2"
-          rippleColor="#fde047"
-          rippleSpeed={2.2}
-          autoAnimate={true}
-          rippleOnClick={true}
-          shadow="0 2px 8px rgba(0,0,0,0.06)"
-        />
-      </div>
+    <ClickSpark
+      sparkColor="#1a1a1e"
+      sparkCount={7}
+      sparkRadius={20}
+      sparkSize={12}
+      duration={420}
+    >
+      <div style={styles.appWrapper}>
+        {/* Interactive 3D Cubes Grid Background */}
+        <div style={styles.cubesBackgroundWrapper} aria-hidden="true">
+          <Cubes 
+            gridSize={10}
+            maxAngle={55}
+            radius={4}
+            borderStyle="2px solid rgba(26, 26, 30, 0.28)"
+            faceColor="#f2e9d2"
+            rippleColor="#fde047"
+            rippleSpeed={2.2}
+            autoAnimate={true}
+            rippleOnClick={true}
+            shadow="0 2px 8px rgba(0,0,0,0.06)"
+          />
+        </div>
 
-      {/* Floating Animated Background Doodles */}
-      <BackgroundDoodles />
+        {/* Floating Animated Background Doodles */}
+        <BackgroundDoodles />
 
-      {/* Foreground Container */}
-      <div style={styles.appContainer}>
-        {/* Navigation Bar */}
-        <header style={styles.navbar} className="sketch-card">
-          <div style={styles.logoGroup} onClick={() => setCurrentStep(1)} style={{ cursor: 'pointer', ...styles.logoGroup }}>
-            <div style={styles.logoIcon}>
-              <Pen size={22} />
-            </div>
-            <div>
-              <div style={styles.brandTitle}>
-                Draw<span className="highlighter-tape-cyan">Pad</span>
+        {/* Foreground Container */}
+        <div style={styles.appContainer}>
+          {/* Navigation Bar */}
+          <header style={styles.navbar} className="sketch-card">
+            <div style={styles.logoGroup} onClick={() => setCurrentStep(1)} style={{ cursor: 'pointer', ...styles.logoGroup }}>
+              <div style={styles.logoIcon}>
+                <Pen size={22} />
               </div>
-              <div style={styles.brandSubtitle}>Hand-drawn coins on pump.fun</div>
-            </div>
-          </div>
-
-          <div style={styles.navActions}>
-            <div style={styles.navTabs}>
-              <button
-                type="button"
-                onClick={() => setCurrentStep(1)}
-                style={{
-                  ...styles.navTabBtn,
-                  background: currentStep === 1 ? 'var(--marker-yellow)' : 'transparent',
-                  borderColor: currentStep === 1 ? '#1a1a1e' : 'transparent',
-                }}
-              >
-                <span>How It Works</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentStep(2)}
-                style={{
-                  ...styles.navTabBtn,
-                  background: currentStep >= 2 ? 'var(--marker-green)' : 'transparent',
-                  borderColor: currentStep >= 2 ? '#1a1a1e' : 'transparent',
-                }}
-              >
-                <span>Launchpad Studio</span>
-              </button>
+              <div>
+                <div style={styles.brandTitle}>
+                  Draw<span className="highlighter-tape-cyan">Pad</span>
+                </div>
+                <div style={styles.brandSubtitle}>Hand-drawn coins on pump.fun</div>
+              </div>
             </div>
 
-            <div style={styles.networkBadge}>
-              <span style={styles.activeDot}></span>
-              <span>Solana Mainnet</span>
+            <div style={styles.navActions}>
+              <div style={styles.navTabs}>
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(1)}
+                  style={{
+                    ...styles.navTabBtn,
+                    background: currentStep === 1 ? 'var(--marker-yellow)' : 'transparent',
+                    borderColor: currentStep === 1 ? '#1a1a1e' : 'transparent',
+                  }}
+                >
+                  <span>How It Works</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(2)}
+                  style={{
+                    ...styles.navTabBtn,
+                    background: currentStep >= 2 ? 'var(--marker-green)' : 'transparent',
+                    borderColor: currentStep >= 2 ? '#1a1a1e' : 'transparent',
+                  }}
+                >
+                  <span>Launchpad Studio</span>
+                </button>
+              </div>
+
+              <div style={styles.networkBadge}>
+                <span style={styles.activeDot}></span>
+                <span>Solana Mainnet</span>
+              </div>
+              <WalletMultiButton />
             </div>
-            <WalletMultiButton />
-          </div>
-        </header>
+          </header>
 
-        {/* Header Stepper (visible on step 2 and 3) */}
-        {currentStep > 1 && (
-          <StepNavigation
-            currentStep={currentStep}
-            onStepChange={(step) => setCurrentStep(step)}
-            canProceedToStep2={true}
-            canProceedToStep3={!!imageDataUrl}
-          />
-        )}
-
-        {/* Wizard Main Area */}
-        <main style={styles.wizardMain}>
-          {/* STEP 1: Ideapad-style Scrollable Step-by-Step Intro & FAQs */}
-          {currentStep === 1 && (
-            <ScrollIntroView onLaunchNow={() => setCurrentStep(2)} />
-          )}
-
-          {/* STEP 2: Dedicated Canvas Studio */}
-          {currentStep === 2 && (
-            <DrawingCanvas
-              initialImage={imageDataUrl}
-              onImageExport={(dataUrl) => setImageDataUrl(dataUrl)}
-              onNext={() => setCurrentStep(3)}
-              onBack={() => setCurrentStep(1)}
+          {/* Header Stepper (visible on step 2 and 3) */}
+          {currentStep > 1 && (
+            <StepNavigation
+              currentStep={currentStep}
+              onStepChange={(step) => setCurrentStep(step)}
+              canProceedToStep2={true}
+              canProceedToStep3={!!imageDataUrl}
             />
           )}
 
-          {/* STEP 3: Dedicated Token Information & Launch Form */}
-          {currentStep === 3 && (
-            <TokenForm
-              formData={formData}
-              onChange={handleFormChange}
-              onLaunch={handleLaunch}
-              onBack={() => setCurrentStep(2)}
-              onEditArtwork={() => setCurrentStep(2)}
-              previewImage={imageDataUrl}
-              loading={loading}
-              statusMessage={statusMessage}
-              isWalletConnected={connected}
+          {/* Wizard Main Area */}
+          <main style={styles.wizardMain}>
+            {/* STEP 1: Ideapad-style Scrollable Step-by-Step Intro & FAQs */}
+            {currentStep === 1 && (
+              <ScrollIntroView onLaunchNow={() => setCurrentStep(2)} />
+            )}
+
+            {/* STEP 2: Dedicated Canvas Studio */}
+            {currentStep === 2 && (
+              <DrawingCanvas
+                initialImage={imageDataUrl}
+                onImageExport={(dataUrl) => setImageDataUrl(dataUrl)}
+                onNext={() => setCurrentStep(3)}
+                onBack={() => setCurrentStep(1)}
+              />
+            )}
+
+            {/* STEP 3: Dedicated Token Information & Launch Form */}
+            {currentStep === 3 && (
+              <TokenForm
+                formData={formData}
+                onChange={handleFormChange}
+                onLaunch={handleLaunch}
+                onBack={() => setCurrentStep(2)}
+                onEditArtwork={() => setCurrentStep(2)}
+                previewImage={imageDataUrl}
+                loading={loading}
+                statusMessage={statusMessage}
+                isWalletConnected={connected}
+              />
+            )}
+          </main>
+
+          {/* Success Launch Modal */}
+          {successData && (
+            <SuccessModal
+              data={successData}
+              onClose={() => setSuccessData(null)}
+              onReset={handleReset}
             />
           )}
-        </main>
-
-        {/* Success Launch Modal */}
-        {successData && (
-          <SuccessModal
-            data={successData}
-            onClose={() => setSuccessData(null)}
-            onReset={handleReset}
-          />
-        )}
+        </div>
       </div>
-    </div>
+    </ClickSpark>
   );
 }
 
