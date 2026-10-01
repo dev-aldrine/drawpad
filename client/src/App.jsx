@@ -1,17 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { VersionedTransaction } from '@solana/web3.js';
 import confetti from 'canvas-confetti';
+import { StepNavigation } from './components/StepNavigation';
+import { IntroView } from './components/IntroView';
 import { DrawingCanvas } from './components/DrawingCanvas';
 import { TokenForm } from './components/TokenForm';
 import { SuccessModal } from './components/SuccessModal';
-import { HowItWorks } from './components/HowItWorks';
 import { Pen, Sparkles } from '@sketchyicons/react';
 
 export function App() {
   const { publicKey, signTransaction, connected } = useWallet();
-  const studioRef = useRef(null);
+
+  // Wizard state: Step 1 (Intro) -> Step 2 (Drawing) -> Step 3 (Token Form)
+  const [currentStep, setCurrentStep] = useState(1);
 
   const [imageDataUrl, setImageDataUrl] = useState(null);
   const [formData, setFormData] = useState({
@@ -33,12 +36,6 @@ export function App() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const scrollToStudio = () => {
-    if (studioRef.current) {
-      studioRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const handleLaunch = async () => {
     if (!connected || !publicKey) {
       alert('Please connect your Phantom or Solana wallet first!');
@@ -46,7 +43,8 @@ export function App() {
     }
 
     if (!imageDataUrl) {
-      alert('Please draw an artwork for your coin on the sketchpad!');
+      alert('Please draw an artwork for your coin in Step 2!');
+      setCurrentStep(2);
       return;
     }
 
@@ -57,7 +55,7 @@ export function App() {
 
     try {
       setLoading(true);
-      setStatusMessage('1/3 Uploading your hand-drawn sketch to IPFS...');
+      setStatusMessage('1/3 Uploading hand-drawn artwork to IPFS...');
 
       const res = await fetch(imageDataUrl);
       const blob = await res.blob();
@@ -153,6 +151,7 @@ export function App() {
 
   const handleReset = () => {
     setSuccessData(null);
+    setCurrentStep(1);
     setFormData({
       name: '',
       symbol: '',
@@ -169,7 +168,7 @@ export function App() {
     <div style={styles.appContainer}>
       {/* Navigation Bar */}
       <header style={styles.navbar} className="sketch-card">
-        <div style={styles.logoGroup}>
+        <div style={styles.logoGroup} onClick={() => setCurrentStep(1)} style={{ cursor: 'pointer', ...styles.logoGroup }}>
           <div style={styles.logoIcon}>
             <Pen size={22} />
           </div>
@@ -190,7 +189,7 @@ export function App() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Header */}
       <section style={styles.heroSection}>
         <div style={styles.heroBadge}>
           <Sparkles size={14} />
@@ -199,31 +198,47 @@ export function App() {
         <h1 style={styles.mainTitle}>
           Draw it. <span className="highlighter-tape-cyan">Launch it.</span>
         </h1>
-        <p style={styles.heroDescription}>
-          The easiest way to doodle your coin, set token metadata, and launch directly to <strong>pump.fun</strong> in seconds.
-        </p>
       </section>
 
-      {/* Introductory How It Works Section */}
-      <HowItWorks onStartDrawing={scrollToStudio} />
+      {/* Step Wizard Navigation Header */}
+      <StepNavigation
+        currentStep={currentStep}
+        onStepChange={(step) => setCurrentStep(step)}
+        canProceedToStep2={true}
+        canProceedToStep3={!!imageDataUrl}
+      />
 
-      {/* Main Studio Area */}
-      <main ref={studioRef} style={styles.studioGrid}>
-        {/* Left: Hand-drawn Canvas Studio */}
-        <DrawingCanvas 
-          onImageExport={(dataUrl) => setImageDataUrl(dataUrl)} 
-          previewUrl={imageDataUrl}
-        />
+      {/* Wizard Content Views */}
+      <main style={styles.wizardMain}>
+        {/* STEP 1: Intro / How It Works */}
+        {currentStep === 1 && (
+          <IntroView onProceed={() => setCurrentStep(2)} />
+        )}
 
-        {/* Right: Token Details & Launch Form */}
-        <TokenForm
-          formData={formData}
-          onChange={handleFormChange}
-          onLaunch={handleLaunch}
-          loading={loading}
-          statusMessage={statusMessage}
-          isWalletConnected={connected}
-        />
+        {/* STEP 2: Dedicated Canvas Studio */}
+        {currentStep === 2 && (
+          <DrawingCanvas
+            initialImage={imageDataUrl}
+            onImageExport={(dataUrl) => setImageDataUrl(dataUrl)}
+            onNext={() => setCurrentStep(3)}
+            onBack={() => setCurrentStep(1)}
+          />
+        )}
+
+        {/* STEP 3: Dedicated Token Information & Launch Form */}
+        {currentStep === 3 && (
+          <TokenForm
+            formData={formData}
+            onChange={handleFormChange}
+            onLaunch={handleLaunch}
+            onBack={() => setCurrentStep(2)}
+            onEditArtwork={() => setCurrentStep(2)}
+            previewImage={imageDataUrl}
+            loading={loading}
+            statusMessage={statusMessage}
+            isWalletConnected={connected}
+          />
+        )}
       </main>
 
       {/* Success Launch Modal */}
@@ -240,12 +255,12 @@ export function App() {
 
 const styles = {
   appContainer: {
-    maxWidth: '1200px',
+    maxWidth: '1080px',
     margin: '0 auto',
     padding: '24px 16px 60px 16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '28px',
+    gap: '20px',
     width: '100%',
   },
   navbar: {
@@ -313,8 +328,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '10px',
-    margin: '6px 0',
+    gap: '6px',
   },
   heroBadge: {
     display: 'inline-flex',
@@ -330,26 +344,16 @@ const styles = {
     fontFamily: 'var(--font-mono)',
   },
   mainTitle: {
-    fontSize: '46px',
+    fontSize: '40px',
     fontWeight: '800',
     color: '#1a1a1e',
     fontFamily: 'var(--font-heading)',
     lineHeight: '1.2',
   },
-  heroDescription: {
-    fontSize: '20px',
-    color: '#475569',
-    maxWidth: '620px',
-    lineHeight: '1.4',
-  },
-  studioGrid: {
+  wizardMain: {
+    width: '100%',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'flex-start',
-    flexWrap: 'wrap',
-    gap: '24px',
-    width: '100%',
-    scrollMarginTop: '20px',
   }
 };
 

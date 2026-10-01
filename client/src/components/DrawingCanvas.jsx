@@ -6,7 +6,8 @@ import {
   Download, 
   Trash, 
   Shapes,
-  Sparkles
+  ArrowRight,
+  ArrowLeft
 } from '@sketchyicons/react';
 
 const PRESET_COLORS = [
@@ -23,7 +24,6 @@ const PRESET_COLORS = [
   '#ffffff', // Chalk White
 ];
 
-// Vector sketch stamps (custom hand-drawn SVG stamps instead of emojis)
 const SKETCH_STAMPS = [
   { id: 'star', label: 'Star', draw: (ctx, x, y, s) => {
     ctx.beginPath();
@@ -85,27 +85,35 @@ const SKETCH_STAMPS = [
   }}
 ];
 
-export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
+export const DrawingCanvas = ({ onImageExport, onNext, onBack, initialImage }) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [tool, setTool] = useState('brush'); // brush, eraser, stamp
   const [color, setColor] = useState('#1a1a1e');
-  const [brushSize, setBrushSize] = useState(5);
+  const [brushSize, setBrushSize] = useState(6);
   const [activeStamp, setActiveStamp] = useState('star');
   const [history, setHistory] = useState([]);
   const [historyStep, setHistoryStep] = useState(-1);
+  const [hasDrawn, setHasDrawn] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     
-    // Clear with clean canvas background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Save initial state
-    saveState();
+    if (initialImage) {
+      const img = new Image();
+      img.src = initialImage;
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        saveState();
+        setHasDrawn(true);
+      };
+    } else {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      saveState();
+    }
   }, []);
 
   const saveState = () => {
@@ -145,6 +153,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    setHasDrawn(false);
     saveState();
   };
 
@@ -170,6 +179,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
     const { x, y } = getCoordinates(e);
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    setHasDrawn(true);
 
     if (tool === 'stamp') {
       const stampObj = SKETCH_STAMPS.find(s => s.id === activeStamp);
@@ -219,16 +229,15 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
   };
 
   return (
-    <div style={styles.container} className="sketch-card sketch-card-tilted-left">
-      {/* Tape decoration at top */}
+    <div style={styles.container} className="sketch-card">
       <div style={styles.tape}>
-        <span>SKETCHPAD CANVASS</span>
+        <span>STEP 1 OF 2 • ARTWORK STUDIO</span>
       </div>
 
       <div style={styles.header}>
-        <div style={styles.badge}>
-          <Pen size={20} />
-          <span>Draw Your Coin PFP</span>
+        <div>
+          <h2 style={styles.title}>Draw your Coin Artwork</h2>
+          <p style={styles.subtitle}>Doodle your coin PFP below. When you're ready, proceed to add token info.</p>
         </div>
         <div style={styles.actions}>
           <button 
@@ -254,129 +263,166 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             style={styles.actionBtn}
             title="Save PNG"
           >
-            <Download size={16} /> Save
+            <Download size={16} /> Save PNG
           </button>
         </div>
       </div>
 
-      {/* Canvas Area */}
-      <div style={styles.canvasOuter}>
-        <div style={styles.canvasInner}>
-          <canvas
-            ref={canvasRef}
-            width={500}
-            height={500}
-            style={styles.canvas}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            onTouchStart={startDrawing}
-            onTouchMove={draw}
-            onTouchEnd={stopDrawing}
-          />
-        </div>
-      </div>
-
-      {/* Toolbar */}
-      <div style={styles.toolbar}>
-        {/* Tool Mode Selection */}
-        <div style={styles.toolModeGroup}>
-          <button
-            type="button"
-            style={{
-              ...styles.toolBtn,
-              background: tool === 'brush' ? 'var(--marker-yellow)' : '#ffffff',
-              boxShadow: tool === 'brush' ? '2px 2px 0px #1a1a1e' : 'none'
-            }}
-            onClick={() => setTool('brush')}
-          >
-            <Pen size={18} /> Pencil
-          </button>
-          <button
-            type="button"
-            style={{
-              ...styles.toolBtn,
-              background: tool === 'eraser' ? 'var(--marker-pink)' : '#ffffff',
-              boxShadow: tool === 'eraser' ? '2px 2px 0px #1a1a1e' : 'none'
-            }}
-            onClick={() => setTool('eraser')}
-          >
-            <Eraser size={18} /> Eraser
-          </button>
-          <button
-            type="button"
-            style={{
-              ...styles.toolBtn,
-              background: tool === 'stamp' ? 'var(--marker-cyan)' : '#ffffff',
-              boxShadow: tool === 'stamp' ? '2px 2px 0px #1a1a1e' : 'none'
-            }}
-            onClick={() => setTool('stamp')}
-          >
-            <Shapes size={18} /> Shapes
-          </button>
-        </div>
-
-        {/* Brush Size Slider */}
-        <div style={styles.sliderGroup}>
-          <span style={styles.sliderLabel}>Stroke Size: <strong>{brushSize}px</strong></span>
-          <input
-            type="range"
-            min="2"
-            max="36"
-            value={brushSize}
-            onChange={(e) => setBrushSize(Number(e.target.value))}
-            style={styles.slider}
-          />
-        </div>
-
-        {/* Color Palette / Stamp Tray */}
-        {tool === 'stamp' ? (
-          <div style={styles.stampTray}>
-            {SKETCH_STAMPS.map((stk) => (
-              <button
-                key={stk.id}
-                type="button"
-                style={{
-                  ...styles.stampBtn,
-                  background: activeStamp === stk.id ? 'var(--marker-yellow)' : '#ffffff',
-                  transform: activeStamp === stk.id ? 'scale(1.05)' : 'scale(1)',
-                  fontWeight: activeStamp === stk.id ? '700' : '500'
-                }}
-                onClick={() => setActiveStamp(stk.id)}
-              >
-                {stk.label}
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div style={styles.paletteRow}>
-            {PRESET_COLORS.map((c) => (
-              <div
-                key={c}
-                onClick={() => {
-                  setColor(c);
-                  if (tool === 'eraser') setTool('brush');
-                }}
-                style={{
-                  ...styles.colorCircle,
-                  backgroundColor: c,
-                  outline: color === c && tool === 'brush' ? '3px solid #1a1a1e' : '1.5px solid #94a3b8'
-                }}
-              />
-            ))}
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => {
-                setColor(e.target.value);
-                if (tool === 'eraser') setTool('brush');
-              }}
-              style={styles.customColorPicker}
-              title="Custom Color"
+      {/* Main Studio Centerpiece */}
+      <div style={styles.studioLayout}>
+        {/* Canvas */}
+        <div style={styles.canvasOuter}>
+          <div style={styles.canvasInner}>
+            <canvas
+              ref={canvasRef}
+              width={500}
+              height={500}
+              style={styles.canvas}
+              onMouseDown={startDrawing}
+              onMouseMove={draw}
+              onMouseUp={stopDrawing}
+              onMouseLeave={stopDrawing}
+              onTouchStart={startDrawing}
+              onTouchMove={draw}
+              onTouchEnd={stopDrawing}
             />
           </div>
-        )}
+        </div>
+
+        {/* Studio Controls Column */}
+        <div style={styles.controlsCol}>
+          {/* Tool Mode Selection */}
+          <div style={styles.sectionBox}>
+            <span style={styles.sectionLabel}>Drawing Tool</span>
+            <div style={styles.toolModeGroup}>
+              <button
+                type="button"
+                style={{
+                  ...styles.toolBtn,
+                  background: tool === 'brush' ? 'var(--marker-yellow)' : '#ffffff',
+                  boxShadow: tool === 'brush' ? '2px 2px 0px #1a1a1e' : 'none'
+                }}
+                onClick={() => setTool('brush')}
+              >
+                <Pen size={18} /> Pencil
+              </button>
+              <button
+                type="button"
+                style={{
+                  ...styles.toolBtn,
+                  background: tool === 'eraser' ? 'var(--marker-pink)' : '#ffffff',
+                  boxShadow: tool === 'eraser' ? '2px 2px 0px #1a1a1e' : 'none'
+                }}
+                onClick={() => setTool('eraser')}
+              >
+                <Eraser size={18} /> Eraser
+              </button>
+              <button
+                type="button"
+                style={{
+                  ...styles.toolBtn,
+                  background: tool === 'stamp' ? 'var(--marker-cyan)' : '#ffffff',
+                  boxShadow: tool === 'stamp' ? '2px 2px 0px #1a1a1e' : 'none'
+                }}
+                onClick={() => setTool('stamp')}
+              >
+                <Shapes size={18} /> Stamps
+              </button>
+            </div>
+          </div>
+
+          {/* Stroke Size Slider */}
+          <div style={styles.sectionBox}>
+            <div style={styles.sliderHeader}>
+              <span style={styles.sectionLabel}>Stroke Width</span>
+              <span style={styles.sliderValue}>{brushSize}px</span>
+            </div>
+            <input
+              type="range"
+              min="2"
+              max="36"
+              value={brushSize}
+              onChange={(e) => setBrushSize(Number(e.target.value))}
+              style={styles.slider}
+            />
+          </div>
+
+          {/* Color Palette or Stamp Tray */}
+          <div style={styles.sectionBox}>
+            <span style={styles.sectionLabel}>
+              {tool === 'stamp' ? 'Select Stamp Shape' : 'Pencil Colors'}
+            </span>
+            {tool === 'stamp' ? (
+              <div style={styles.stampTray}>
+                {SKETCH_STAMPS.map((stk) => (
+                  <button
+                    key={stk.id}
+                    type="button"
+                    style={{
+                      ...styles.stampBtn,
+                      background: activeStamp === stk.id ? 'var(--marker-yellow)' : '#ffffff',
+                      transform: activeStamp === stk.id ? 'scale(1.05)' : 'scale(1)',
+                      fontWeight: activeStamp === stk.id ? '700' : '500'
+                    }}
+                    onClick={() => setActiveStamp(stk.id)}
+                  >
+                    {stk.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div style={styles.paletteRow}>
+                {PRESET_COLORS.map((c) => (
+                  <div
+                    key={c}
+                    onClick={() => {
+                      setColor(c);
+                      if (tool === 'eraser') setTool('brush');
+                    }}
+                    style={{
+                      ...styles.colorCircle,
+                      backgroundColor: c,
+                      outline: color === c && tool === 'brush' ? '3px solid #1a1a1e' : '1.5px solid #94a3b8'
+                    }}
+                  />
+                ))}
+                <input
+                  type="color"
+                  value={color}
+                  onChange={(e) => {
+                    setColor(e.target.value);
+                    if (tool === 'eraser') setTool('brush');
+                  }}
+                  style={styles.customColorPicker}
+                  title="Custom Color"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Footer */}
+      <div style={styles.navFooter}>
+        <button
+          type="button"
+          onClick={onBack}
+          className="sketch-btn"
+          style={styles.backBtn}
+        >
+          <ArrowLeft size={18} />
+          <span>Back to Intro</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onNext}
+          className="sketch-btn sketch-btn-green"
+          style={styles.nextBtn}
+        >
+          <span>Next: Token Details</span>
+          <ArrowRight size={18} />
+        </button>
       </div>
     </div>
   );
@@ -384,22 +430,22 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
 
 const styles = {
   container: {
-    padding: '24px',
+    padding: '32px 28px 24px 28px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
-    maxWidth: '540px',
+    gap: '20px',
     width: '100%',
     position: 'relative',
+    backgroundColor: '#ffffff',
   },
   tape: {
     position: 'absolute',
     top: '-14px',
     left: '50%',
-    transform: 'translateX(-50%) rotate(-1deg)',
+    transform: 'translateX(-50%) rotate(-0.5deg)',
     background: '#fef08a',
     border: '2px dashed #1a1a1e',
-    padding: '2px 14px',
+    padding: '2px 16px',
     fontFamily: 'var(--font-mono)',
     fontSize: '11px',
     fontWeight: '700',
@@ -410,29 +456,29 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: '6px',
     flexWrap: 'wrap',
-    gap: '8px',
+    gap: '12px',
   },
-  badge: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '20px',
-    fontWeight: '700',
+  title: {
+    fontSize: '28px',
+    fontWeight: '800',
     color: '#1a1a1e',
     fontFamily: 'var(--font-heading)',
   },
+  subtitle: {
+    fontSize: '16px',
+    color: '#64748b',
+  },
   actions: {
     display: 'flex',
-    gap: '6px',
+    gap: '8px',
   },
   actionBtn: {
     background: '#ffffff',
     border: '2px solid #1a1a1e',
     color: '#1a1a1e',
     borderRadius: '8px',
-    padding: '4px 10px',
+    padding: '6px 12px',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -441,13 +487,21 @@ const styles = {
     fontWeight: '700',
     fontFamily: 'var(--font-handwriting)',
     boxShadow: '1.5px 1.5px 0px #1a1a1e',
-    transition: 'all 0.1s',
+  },
+  studioLayout: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(320px, 480px) 1fr',
+    gap: '24px',
+    alignItems: 'start',
+    '@media (max-width: 840px)': {
+      gridTemplateColumns: '1fr',
+    }
   },
   canvasOuter: {
-    padding: '10px',
+    padding: '12px',
     background: '#f8fafc',
     border: '2.5px solid #1a1a1e',
-    borderRadius: '12px',
+    borderRadius: '14px',
     boxShadow: 'inset 2px 2px 0px rgba(0,0,0,0.05)',
   },
   canvasInner: {
@@ -466,11 +520,25 @@ const styles = {
     cursor: 'crosshair',
     touchAction: 'none',
   },
-  toolbar: {
+  controlsCol: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
-    marginTop: '4px',
+    gap: '16px',
+  },
+  sectionBox: {
+    background: '#f8fafc',
+    border: '2px solid #1a1a1e',
+    borderRadius: '12px',
+    padding: '14px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  sectionLabel: {
+    fontSize: '15px',
+    fontWeight: '700',
+    color: '#1a1a1e',
+    fontFamily: 'var(--font-heading)',
   },
   toolModeGroup: {
     display: 'grid',
@@ -480,30 +548,29 @@ const styles = {
   toolBtn: {
     border: '2px solid #1a1a1e',
     borderRadius: '8px',
-    padding: '8px 10px',
+    padding: '10px 8px',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
+    gap: '6px',
     fontWeight: '700',
-    fontSize: '16px',
+    fontSize: '15px',
     fontFamily: 'var(--font-handwriting)',
-    transition: 'all 0.12s',
   },
-  sliderGroup: {
+  sliderHeader: {
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    gap: '12px',
+    alignItems: 'center',
   },
-  sliderLabel: {
-    fontSize: '16px',
+  sliderValue: {
+    fontFamily: 'var(--font-mono)',
+    fontSize: '13px',
+    fontWeight: '700',
     color: '#1a1a1e',
-    minWidth: '130px',
   },
   slider: {
-    flex: 1,
+    width: '100%',
     accentColor: '#1a1a1e',
     cursor: 'pointer',
   },
@@ -512,22 +579,17 @@ const styles = {
     flexWrap: 'wrap',
     gap: '8px',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: '6px',
-    background: '#f8fafc',
-    border: '2px solid #1a1a1e',
-    borderRadius: '10px',
   },
   colorCircle: {
-    width: '26px',
-    height: '26px',
+    width: '28px',
+    height: '28px',
     borderRadius: '50%',
     cursor: 'pointer',
     transition: 'transform 0.1s ease',
   },
   customColorPicker: {
-    width: '28px',
-    height: '28px',
+    width: '30px',
+    height: '30px',
     borderRadius: '6px',
     border: '2px solid #1a1a1e',
     cursor: 'pointer',
@@ -536,22 +598,35 @@ const styles = {
   },
   stampTray: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(6, 1fr)',
-    gap: '6px',
-    background: '#f8fafc',
-    border: '2px solid #1a1a1e',
-    borderRadius: '10px',
-    padding: '8px',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '8px',
   },
   stampBtn: {
-    fontSize: '13px',
+    fontSize: '14px',
     border: '2px solid #1a1a1e',
     borderRadius: '8px',
-    padding: '6px 4px',
+    padding: '8px 4px',
     cursor: 'pointer',
     boxShadow: '1.5px 1.5px 0px #1a1a1e',
     fontFamily: 'var(--font-handwriting)',
-    transition: 'all 0.1s ease',
     textAlign: 'center',
+  },
+  navFooter: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTop: '2px dashed #cbd5e1',
+    paddingTop: '16px',
+    marginTop: '8px',
+    flexWrap: 'wrap',
+    gap: '12px',
+  },
+  backBtn: {
+    padding: '10px 20px',
+    fontSize: '17px',
+  },
+  nextBtn: {
+    padding: '12px 28px',
+    fontSize: '18px',
   }
 };
