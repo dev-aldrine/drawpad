@@ -171,15 +171,16 @@ export function App() {
       {/* Interactive Cubes Grid Background */}
       <div style={styles.cubesBackgroundWrapper} aria-hidden="true">
         <Cubes 
-          gridSize={12}
-          maxAngle={50}
+          gridSize={10}
+          maxAngle={55}
           radius={4}
-          borderStyle="1.5px solid rgba(26, 26, 30, 0.12)"
-          faceColor="#f7f1e1"
+          borderStyle="2px solid rgba(26, 26, 30, 0.28)"
+          faceColor="#f2e9d2"
           rippleColor="#fde047"
-          rippleSpeed={1.8}
+          rippleSpeed={2.2}
           autoAnimate={true}
           rippleOnClick={true}
+          shadow="0 2px 8px rgba(0,0,0,0.06)"
         />
       </div>
 
@@ -290,7 +291,7 @@ const styles = {
     width: '100vw',
     height: '100vh',
     zIndex: 0,
-    opacity: 0.65,
+    opacity: 0.92,
     pointerEvents: 'auto',
     display: 'flex',
     alignItems: 'center',

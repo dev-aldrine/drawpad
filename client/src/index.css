@@ -39,11 +39,11 @@
 
 body {
   background-color: var(--bg-paper);
-  /* Doodled graph & margin ruler pattern */
+  /* Very subtle, faint notebook pattern so 3D Cubes background pops */
   background-image: 
-    linear-gradient(rgba(26, 26, 30, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26, 26, 30, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, transparent 60px, rgba(239, 68, 68, 0.15) 60px, rgba(239, 68, 68, 0.15) 62px, transparent 62px);
+    linear-gradient(rgba(26, 26, 30, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 26, 30, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, transparent 60px, rgba(239, 68, 68, 0.08) 60px, rgba(239, 68, 68, 0.08) 61px, transparent 61px);
   background-size: 24px 24px, 24px 24px, 100% 100%;
   background-attachment: fixed;
   color: var(--ink-pencil);
