@@ -190,7 +190,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
     },
     {
       q: 'Is DrawPad non-custodial?',
-      a: 'Yes! DrawPad never holds your private keys or funds. Every launch transaction is signed directly and securely inside your Phantom or Solflare wallet.'
+      a: 'Yes! DrawPad never holds your private keys or funds. Every launch transaction is signed directly and securely inside your Phantom wallet.'
     }
   ];
 
