@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, CheckCircle, Copy, Rocket, RotateCcw } from 'lucide-react';
+import { ExternalLink, Check, Copy, Rocket, RefreshCw } from '@sketchyicons/react';
 
 export const SuccessModal = ({ data, onClose, onReset }) => {
   const [copied, setCopied] = React.useState(false);
@@ -19,16 +19,16 @@ export const SuccessModal = ({ data, onClose, onReset }) => {
       <div style={styles.modal} className="sketch-card">
         {/* Tape header */}
         <div style={styles.tape}>
-          <span>🎉 LAUNCH SUCCESSFUL</span>
+          <span>LAUNCH SUCCESSFUL</span>
         </div>
 
         <div style={styles.iconContainer}>
-          <span style={{ fontSize: '48px' }}>🚀🎨</span>
+          <Rocket size={44} />
         </div>
 
         <h2 style={styles.title}>Your Coin is Live on Pump.fun!</h2>
         <p style={styles.subtitle}>
-          Your hand-drawn masterpiece is now tradable on Solana bonding curve.
+          Your hand-drawn token is now tradable on the Solana bonding curve.
         </p>
 
         {data.previewImage && (
@@ -51,7 +51,7 @@ export const SuccessModal = ({ data, onClose, onReset }) => {
               </span>
               <button type="button" onClick={copyAddress} style={styles.copyBtn}>
                 <Copy size={14} />
-                <span>{copied ? 'Copied!' : 'Copy'}</span>
+                <span>{copied ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
           </div>
@@ -79,7 +79,8 @@ export const SuccessModal = ({ data, onClose, onReset }) => {
             className="sketch-btn sketch-btn-green"
             style={styles.pumpFunBtn}
           >
-            <span>👉 View on pump.fun</span>
+            <Rocket size={18} />
+            <span>View on pump.fun</span>
           </a>
 
           <button
@@ -88,7 +89,7 @@ export const SuccessModal = ({ data, onClose, onReset }) => {
             className="sketch-btn"
             style={styles.secondaryBtn}
           >
-            <RotateCcw size={16} />
+            <RefreshCw size={16} />
             <span>Draw Another Coin</span>
           </button>
         </div>

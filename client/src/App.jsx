@@ -6,7 +6,7 @@ import confetti from 'canvas-confetti';
 import { DrawingCanvas } from './components/DrawingCanvas';
 import { TokenForm } from './components/TokenForm';
 import { SuccessModal } from './components/SuccessModal';
-import { Sparkles, PenTool, Zap, ShieldCheck, HelpCircle } from 'lucide-react';
+import { Pen, Zap, Shield, Sparkles, Rocket } from '@sketchyicons/react';
 
 export function App() {
   const { publicKey, signTransaction, connected } = useWallet();
@@ -51,7 +51,6 @@ export function App() {
       setLoading(true);
       setStatusMessage('1/3 Uploading your hand-drawn sketch to IPFS...');
 
-      // Convert data URL to Blob for multipart upload
       const res = await fetch(imageDataUrl);
       const blob = await res.blob();
 
@@ -76,7 +75,6 @@ export function App() {
 
       setStatusMessage('2/3 Generating PumpPortal bonding curve transaction...');
 
-      // Create Launch Transaction
       const launchTxRes = await fetch('/api/create-launch-tx', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -100,17 +98,14 @@ export function App() {
 
       setStatusMessage('3/3 Approve the launch transaction in Phantom wallet...');
 
-      // Deserialize transaction for user signature
       const txBuffer = Buffer.from(launchTxData.transactionBase64, 'base64');
       const transaction = VersionedTransaction.deserialize(txBuffer);
 
-      // Sign with Phantom Wallet
       const signedTransaction = await signTransaction(transaction);
       const signedTxBase64 = Buffer.from(signedTransaction.serialize()).toString('base64');
 
       setStatusMessage('Broadcasting token launch to Solana Mainnet...');
 
-      // Send signed transaction to server to broadcast to Solana
       const broadcastRes = await fetch('/api/broadcast-tx', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,7 +119,6 @@ export function App() {
         throw new Error(broadcastData.details || broadcastData.error || 'Transaction broadcast failed');
       }
 
-      // Trigger Celebration Confetti
       confetti({
         particleCount: 140,
         spread: 90,
@@ -169,7 +163,7 @@ export function App() {
       <header style={styles.navbar} className="sketch-card">
         <div style={styles.logoGroup}>
           <div style={styles.logoIcon}>
-            <span style={{ fontSize: '24px' }}>✏️</span>
+            <Pen size={22} />
           </div>
           <div>
             <div style={styles.brandTitle}>
@@ -188,16 +182,17 @@ export function App() {
         </div>
       </header>
 
-      {/* Hero Banner with Hand-Drawn Notebook Feel */}
+      {/* Hero Banner */}
       <section style={styles.heroSection}>
         <div style={styles.heroBadge}>
-          <span>⭐️ THE HAND-DRAWN SOLANA LAUNCHPAD ⭐️</span>
+          <Sparkles size={14} />
+          <span>THE HAND-DRAWN SOLANA LAUNCHPAD</span>
         </div>
         <h1 style={styles.mainTitle}>
           Draw it. <span className="highlighter-tape-cyan">Launch it.</span>
         </h1>
         <p style={styles.heroDescription}>
-          Doodle your coin on the canvas, fill in the details, and launch directly to <strong>pump.fun</strong> in seconds!
+          Doodle your coin on the canvas, fill in the details, and launch directly to <strong>pump.fun</strong> in seconds.
         </p>
       </section>
 
@@ -223,17 +218,23 @@ export function App() {
       {/* Sketchy Feature Cards */}
       <footer style={styles.featuresFooter}>
         <div style={styles.featureCard} className="sketch-card">
-          <div style={{ fontSize: '24px' }}>⚡️</div>
+          <div style={styles.featureIconWrap}>
+            <Zap size={22} />
+          </div>
           <h4 style={styles.featureTitle}>Instant Bonding Curve</h4>
           <p style={styles.featureText}>Directly creates pump.fun token pool via PumpPortal API.</p>
         </div>
         <div style={styles.featureCard} className="sketch-card">
-          <div style={{ fontSize: '24px' }}>🎨</div>
+          <div style={styles.featureIconWrap}>
+            <Pen size={22} />
+          </div>
           <h4 style={styles.featureTitle}>100% Hand-Drawn Art</h4>
           <p style={styles.featureText}>Your drawing is uploaded directly to decentralized IPFS metadata.</p>
         </div>
         <div style={styles.featureCard} className="sketch-card">
-          <div style={{ fontSize: '24px' }}>🔒</div>
+          <div style={styles.featureIconWrap}>
+            <Shield size={22} />
+          </div>
           <h4 style={styles.featureTitle}>Phantom Non-Custodial</h4>
           <p style={styles.featureText}>You sign every launch transaction securely with your wallet.</p>
         </div>
@@ -277,7 +278,7 @@ const styles = {
     background: '#fef08a',
     border: '2px solid #1a1a1e',
     borderRadius: '10px',
-    padding: '4px 8px',
+    padding: '6px 10px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -330,6 +331,9 @@ const styles = {
     margin: '6px 0',
   },
   heroBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
     background: '#fed7aa',
     border: '2px dashed #1a1a1e',
     color: '#1a1a1e',
@@ -370,9 +374,20 @@ const styles = {
     padding: '18px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px',
+    gap: '8px',
     textAlign: 'left',
     backgroundColor: '#ffffff',
+  },
+  featureIconWrap: {
+    background: '#fef08a',
+    border: '2px solid #1a1a1e',
+    borderRadius: '8px',
+    width: '38px',
+    height: '38px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '1.5px 1.5px 0px #1a1a1e',
   },
   featureTitle: {
     fontSize: '18px',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Coins, Sparkles, Globe, MessageCircle } from 'lucide-react';
+import { Coins, Sparkles, Globe, MessageCircle, Rocket } from '@sketchyicons/react';
 
 export const TokenForm = ({
   formData,
@@ -13,16 +13,16 @@ export const TokenForm = ({
     <div style={styles.container} className="sketch-card sketch-card-tilted-right">
       {/* Tape decoration */}
       <div style={styles.tape}>
-        <span>📋 LAUNCHPAD SPECS</span>
+        <span>LAUNCHPAD SPECS</span>
       </div>
 
       <div style={styles.header}>
         <div style={styles.badge}>
-          <Coins size={20} color="#1a1a1e" />
-          <span>Coin Profile 🚀</span>
+          <Coins size={22} />
+          <span>Coin Profile</span>
         </div>
         <span style={styles.pumpfunTag}>
-          ⚡ pump.fun
+          pump.fun
         </span>
       </div>
 
@@ -117,13 +117,13 @@ export const TokenForm = ({
 
         {/* Socials Divider */}
         <div style={styles.divider}>
-          <span>🔗 Social Links (Optional)</span>
+          <span>Social Links (Optional)</span>
         </div>
 
         {/* Twitter / X */}
         <div style={styles.inputGroupFull}>
           <div style={styles.socialInputWrapper}>
-            <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#1a1a1e' }}>𝕏</span>
+            <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#1a1a1e', width: '20px', textAlign: 'center' }}>X</span>
             <input
               type="url"
               placeholder="Twitter / X (https://x.com/...)"
@@ -137,7 +137,7 @@ export const TokenForm = ({
         {/* Telegram */}
         <div style={styles.inputGroupFull}>
           <div style={styles.socialInputWrapper}>
-            <MessageCircle size={17} color="#16a34a" />
+            <MessageCircle size={18} />
             <input
               type="url"
               placeholder="Telegram Link (https://t.me/...)"
@@ -151,7 +151,7 @@ export const TokenForm = ({
         {/* Website */}
         <div style={styles.inputGroupFull}>
           <div style={styles.socialInputWrapper}>
-            <Globe size={17} color="#0284c7" />
+            <Globe size={18} />
             <input
               type="url"
               placeholder="Website Link (https://...)"
@@ -166,7 +166,7 @@ export const TokenForm = ({
       {/* Status Message */}
       {statusMessage && (
         <div style={styles.statusBox}>
-          <span style={{ fontSize: '18px' }}>✏️</span>
+          <Sparkles size={18} />
           <span>{statusMessage}</span>
         </div>
       )}
@@ -181,18 +181,18 @@ export const TokenForm = ({
       >
         {loading ? (
           <>
-            <span>⏳ Inscribing on Solana...</span>
+            <span>Inscribing on Solana...</span>
           </>
         ) : (
           <>
-            <Sparkles size={20} />
-            <span>{!isWalletConnected ? '👉 Connect Phantom to Launch' : '🚀 Launch to Pump.fun'}</span>
+            <Rocket size={20} />
+            <span>{!isWalletConnected ? 'Connect Phantom to Launch' : 'Launch to Pump.fun'}</span>
           </>
         )}
       </button>
 
       <div style={styles.footerNote}>
-        <span>⚡ Hand-signed on Phantom • Verified by PumpPortal</span>
+        <span>Hand-signed on Phantom • Verified by PumpPortal</span>
       </div>
     </div>
   );

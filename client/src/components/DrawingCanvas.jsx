@@ -1,18 +1,17 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { 
-  PenTool, 
+  Pen, 
   Eraser, 
-  RotateCcw, 
+  Undo, 
   Download, 
-  Trash2, 
-  Smile,
-  Sparkles,
-  Highlighter
-} from 'lucide-react';
+  Trash, 
+  Shapes,
+  Sparkles
+} from '@sketchyicons/react';
 
 const PRESET_COLORS = [
   '#1a1a1e', // Pencil Black
-  '#475569', // Slate Gray
+  '#475569', // Graphite Gray
   '#dc2626', // Crayon Red
   '#ea580c', // Orange
   '#ca8a04', // Mustard Gold
@@ -24,7 +23,67 @@ const PRESET_COLORS = [
   '#ffffff', // Chalk White
 ];
 
-const STICKERS = ['🐸', '🚀', '🐕', '🌙', '💎', '🔥', '👑', '💰', '⚡', '🥑', '🎯', '🍌'];
+// Vector sketch stamps (custom hand-drawn SVG stamps instead of emojis)
+const SKETCH_STAMPS = [
+  { id: 'star', label: 'Star', draw: (ctx, x, y, s) => {
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * s + x, -Math.sin((18 + i * 72) * Math.PI / 180) * s + y);
+      ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (s/2) + x, -Math.sin((54 + i * 72) * Math.PI / 180) * (s/2) + y);
+    }
+    ctx.closePath();
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }},
+  { id: 'heart', label: 'Heart', draw: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.moveTo(x, y + s/4);
+    ctx.bezierCurveTo(x, y, x - s/2, y - s/2, x - s/2, y + s/4);
+    ctx.bezierCurveTo(x - s/2, y + s*0.7, x, y + s, x, y + s*1.2);
+    ctx.bezierCurveTo(x, y + s, x + s/2, y + s*0.7, x + s/2, y + s/4);
+    ctx.bezierCurveTo(x + s/2, y - s/2, x, y, x, y + s/4);
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }},
+  { id: 'moon', label: 'Moon', draw: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.arc(x, y, s, 0.5 * Math.PI, 1.5 * Math.PI, true);
+    ctx.arc(x - s * 0.3, y, s * 0.8, 1.5 * Math.PI, 0.5 * Math.PI, false);
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }},
+  { id: 'lightning', label: 'Bolt', draw: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.moveTo(x + s*0.2, y - s);
+    ctx.lineTo(x - s*0.4, y);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x - s*0.2, y + s);
+    ctx.lineTo(x + s*0.5, y - s*0.1);
+    ctx.lineTo(x + s*0.1, y - s*0.1);
+    ctx.closePath();
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }},
+  { id: 'cloud', label: 'Cloud', draw: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.arc(x - s*0.4, y, s*0.4, Math.PI * 0.5, Math.PI * 1.5);
+    ctx.arc(x, y - s*0.3, s*0.5, Math.PI * 1.0, Math.PI * 2.0);
+    ctx.arc(x + s*0.4, y, s*0.4, Math.PI * 1.5, Math.PI * 0.5);
+    ctx.closePath();
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }},
+  { id: 'circle-cross', label: 'Target', draw: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.arc(x, y, s*0.8, 0, 2 * Math.PI);
+    ctx.moveTo(x - s, y);
+    ctx.lineTo(x + s, y);
+    ctx.moveTo(x, y - s);
+    ctx.lineTo(x, y + s);
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }}
+];
 
 export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
   const canvasRef = useRef(null);
@@ -32,7 +91,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
   const [tool, setTool] = useState('brush'); // brush, eraser, stamp
   const [color, setColor] = useState('#1a1a1e');
   const [brushSize, setBrushSize] = useState(5);
-  const [activeSticker, setActiveSticker] = useState('🐸');
+  const [activeStamp, setActiveStamp] = useState('star');
   const [history, setHistory] = useState([]);
   const [historyStep, setHistoryStep] = useState(-1);
 
@@ -113,11 +172,12 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
     const ctx = canvas.getContext('2d');
 
     if (tool === 'stamp') {
-      ctx.font = `${brushSize * 6}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(activeSticker, x, y);
-      saveState();
+      const stampObj = SKETCH_STAMPS.find(s => s.id === activeStamp);
+      if (stampObj) {
+        ctx.strokeStyle = color;
+        stampObj.draw(ctx, x, y, brushSize * 4);
+        saveState();
+      }
       return;
     }
 
@@ -162,13 +222,13 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
     <div style={styles.container} className="sketch-card sketch-card-tilted-left">
       {/* Tape decoration at top */}
       <div style={styles.tape}>
-        <span>📌 SKETCHPAD CANVASS</span>
+        <span>SKETCHPAD CANVASS</span>
       </div>
 
       <div style={styles.header}>
         <div style={styles.badge}>
-          <PenTool size={18} color="#1a1a1e" />
-          <span>Draw Your Coin PFP ✍️</span>
+          <Pen size={20} />
+          <span>Draw Your Coin PFP</span>
         </div>
         <div style={styles.actions}>
           <button 
@@ -178,7 +238,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             style={styles.actionBtn}
             title="Undo"
           >
-            <RotateCcw size={16} /> Undo
+            <Undo size={16} /> Undo
           </button>
           <button 
             type="button"
@@ -186,7 +246,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             style={styles.actionBtn}
             title="Clear Canvas"
           >
-            <Trash2 size={16} /> Clear
+            <Trash size={16} /> Clear
           </button>
           <button 
             type="button"
@@ -231,7 +291,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             }}
             onClick={() => setTool('brush')}
           >
-            <PenTool size={16} /> Pencil / Brush
+            <Pen size={18} /> Pencil
           </button>
           <button
             type="button"
@@ -242,7 +302,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             }}
             onClick={() => setTool('eraser')}
           >
-            <Eraser size={16} /> Eraser
+            <Eraser size={18} /> Eraser
           </button>
           <button
             type="button"
@@ -253,7 +313,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             }}
             onClick={() => setTool('stamp')}
           >
-            <Smile size={16} /> Stickers
+            <Shapes size={18} /> Shapes
           </button>
         </div>
 
@@ -270,21 +330,22 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
           />
         </div>
 
-        {/* Color Palette / Sticker Tray */}
+        {/* Color Palette / Stamp Tray */}
         {tool === 'stamp' ? (
-          <div style={styles.stickerTray}>
-            {STICKERS.map((stk) => (
+          <div style={styles.stampTray}>
+            {SKETCH_STAMPS.map((stk) => (
               <button
-                key={stk}
+                key={stk.id}
                 type="button"
                 style={{
-                  ...styles.stickerBtn,
-                  background: activeSticker === stk ? 'var(--marker-yellow)' : '#ffffff',
-                  transform: activeSticker === stk ? 'scale(1.15) rotate(-3deg)' : 'scale(1)'
+                  ...styles.stampBtn,
+                  background: activeStamp === stk.id ? 'var(--marker-yellow)' : '#ffffff',
+                  transform: activeStamp === stk.id ? 'scale(1.05)' : 'scale(1)',
+                  fontWeight: activeStamp === stk.id ? '700' : '500'
                 }}
-                onClick={() => setActiveSticker(stk)}
+                onClick={() => setActiveStamp(stk.id)}
               >
-                {stk}
+                {stk.label}
               </button>
             ))}
           </div>
@@ -375,7 +436,7 @@ const styles = {
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
-    gap: '4px',
+    gap: '6px',
     fontSize: '14px',
     fontWeight: '700',
     fontFamily: 'var(--font-handwriting)',
@@ -424,7 +485,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '6px',
+    gap: '8px',
     fontWeight: '700',
     fontSize: '16px',
     fontFamily: 'var(--font-handwriting)',
@@ -473,22 +534,24 @@ const styles = {
     background: 'none',
     padding: 0,
   },
-  stickerTray: {
+  stampTray: {
     display: 'grid',
     gridTemplateColumns: 'repeat(6, 1fr)',
-    gap: '8px',
+    gap: '6px',
     background: '#f8fafc',
     border: '2px solid #1a1a1e',
     borderRadius: '10px',
     padding: '8px',
   },
-  stickerBtn: {
-    fontSize: '22px',
+  stampBtn: {
+    fontSize: '13px',
     border: '2px solid #1a1a1e',
     borderRadius: '8px',
-    padding: '4px',
+    padding: '6px 4px',
     cursor: 'pointer',
     boxShadow: '1.5px 1.5px 0px #1a1a1e',
+    fontFamily: 'var(--font-handwriting)',
     transition: 'all 0.1s ease',
+    textAlign: 'center',
   }
 };
