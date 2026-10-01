@@ -161,34 +161,27 @@ export const LaunchedCoinsView = ({ onStartNewCoin }) => {
       ) : (
         <div style={styles.coinGrid}>
           {filteredCoins.map((coin, index) => (
-            <motion.div
+            <TiltedCard
               key={coin.mintPublicKey || index}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.06 }}
-              style={styles.coinCard}
+              rotateAmplitude={12}
+              scaleOnHover={1.03}
+              showMobileWarning={false}
+              showTooltip={false}
               className="sketch-card"
+              style={styles.coinCard}
             >
               {/* Card Tape */}
               <div style={styles.cardTape}>
                 <span>${coin.symbol}</span>
               </div>
 
-              {/* Artwork Box with 3D Tilted Card Interaction */}
+              {/* Artwork Box */}
               <div style={styles.imageBox}>
                 {coin.imageUrl ? (
-                  <TiltedCard
-                    imageSrc={coin.imageUrl}
-                    altText={coin.name}
-                    captionText={`$${coin.symbol}`}
-                    containerHeight="100%"
-                    containerWidth="100%"
-                    imageHeight="100%"
-                    imageWidth="100%"
-                    rotateAmplitude={12}
-                    scaleOnHover={1.05}
-                    showMobileWarning={false}
-                    showTooltip={true}
+                  <img
+                    src={coin.imageUrl}
+                    alt={coin.name}
+                    style={styles.coinImg}
                   />
                 ) : (
                   <div style={styles.placeholderImg}>
@@ -253,7 +246,7 @@ export const LaunchedCoinsView = ({ onStartNewCoin }) => {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </TiltedCard>
           ))}
         </div>
       )}

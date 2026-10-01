@@ -3,25 +3,24 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 import './TiltedCard.css';
 
 const springValues = {
-  damping: 30,
-  stiffness: 100,
-  mass: 2
+  damping: 25,
+  stiffness: 120,
+  mass: 1.5
 };
 
 export default function TiltedCard({
+  children,
   imageSrc,
   altText = 'Tilted card image',
   captionText = '',
-  containerHeight = '100%',
+  containerHeight = 'auto',
   containerWidth = '100%',
-  imageHeight = '100%',
-  imageWidth = '100%',
-  scaleOnHover = 1.06,
-  rotateAmplitude = 14,
+  scaleOnHover = 1.03,
+  rotateAmplitude = 12,
   showMobileWarning = false,
   showTooltip = false,
-  overlayContent = null,
-  displayOverlayContent = false
+  className = '',
+  style = {}
 }) {
   const ref = useRef(null);
 
@@ -79,10 +78,11 @@ export default function TiltedCard({
   }
 
   return (
-    <figure
+    <div
       ref={ref}
-      className="tilted-card-figure"
+      className="tilted-card-wrapper"
       style={{
+        perspective: 1000,
         height: containerHeight,
         width: containerWidth
       }}
@@ -90,48 +90,45 @@ export default function TiltedCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {showMobileWarning && (
-        <div className="tilted-card-mobile-alert">This effect is not optimized for mobile. Check on desktop.</div>
-      )}
-
       <motion.div
-        className="tilted-card-inner"
+        className={`tilted-card-inner ${className}`}
         style={{
-          width: imageWidth,
-          height: imageHeight,
           rotateX,
           rotateY,
-          scale
+          scale,
+          transformStyle: 'preserve-3d',
+          height: '100%',
+          width: '100%',
+          ...style
         }}
       >
-        <motion.img
-          src={imageSrc}
-          alt={altText}
-          className="tilted-card-img"
-          style={{
-            width: imageWidth,
-            height: imageHeight
-          }}
-        />
+        {children ? (
+          children
+        ) : (
+          <img
+            src={imageSrc}
+            alt={altText}
+            className="tilted-card-img"
+          />
+        )}
 
-        {displayOverlayContent && overlayContent && (
-          <motion.div className="tilted-card-overlay">{overlayContent}</motion.div>
+        {showTooltip && (
+          <motion.div
+            className="tilted-card-caption"
+            style={{
+              x: rawX,
+              y: rawY,
+              opacity,
+              rotate: rotateFigcaption,
+              position: 'absolute',
+              pointerEvents: 'none',
+              zIndex: 30
+            }}
+          >
+            {captionText}
+          </motion.div>
         )}
       </motion.div>
-
-      {showTooltip && (
-        <motion.figcaption
-          className="tilted-card-caption"
-          style={{
-            x: rawX,
-            y: rawY,
-            opacity,
-            rotate: rotateFigcaption
-          }}
-        >
-          {captionText}
-        </motion.figcaption>
-      )}
-    </figure>
+    </div>
   );
 }
