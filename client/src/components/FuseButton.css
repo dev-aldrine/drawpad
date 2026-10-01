@@ -171,9 +171,9 @@
 
 @media (hover: hover) and (pointer: fine) {
   .fuse-button__idle:not(:disabled):hover {
-    background: #fee2e2;
+    background: #dc2626;
   }
   .fuse-button__undo:hover {
-    background: #fef08a;
+    background: #b91c1c;
   }
 }
