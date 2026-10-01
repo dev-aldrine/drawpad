@@ -5,7 +5,6 @@ import { VersionedTransaction } from '@solana/web3.js';
 import confetti from 'canvas-confetti';
 import ClickSpark from './components/ClickSpark';
 import DriftWall from './components/DriftWall';
-import { BackgroundDoodles } from './components/BackgroundDoodles';
 import { StepNavigation } from './components/StepNavigation';
 import { ScrollIntroView } from './components/ScrollIntroView';
 import { DrawingCanvas } from './components/DrawingCanvas';
@@ -209,9 +208,6 @@ export function App() {
             roll={2}
           />
         </div>
-
-        {/* Floating Animated Background Doodles */}
-        <BackgroundDoodles />
 
         {/* Foreground Container */}
         <div style={styles.appContainer}>
