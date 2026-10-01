@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: drawpad
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PORT
+        value: 10000
+      - key: RPC_ENDPOINT
+        value: https://solana-rpc.publicnode.com
+      - key: PINATA_JWT
+        sync: false

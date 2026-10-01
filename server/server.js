@@ -527,6 +527,19 @@ app.post('/api/broadcast-tx', async (req, res) => {
   }
 });
 
+// Serve static frontend assets in production (Render / Cloud deployment)
+const CLIENT_DIST = path.join(__dirname, '../client/dist');
+if (fs.existsSync(CLIENT_DIST)) {
+  app.use(express.static(CLIENT_DIST));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(CLIENT_DIST, 'index.html'));
+  });
+}
+
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 DrawPad Server running on http://127.0.0.1:${PORT}`);
+  console.log(`🚀 DrawPad Server running on http://0.0.0.0:${PORT}`);
 });
+
