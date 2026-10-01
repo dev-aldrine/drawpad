@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Rocket, Sparkles, RefreshCw, Pen, ExternalLink } from '@sketchyicons/react';
+import TiltedCard from './TiltedCard';
 
 // Built-in initial community doodle coins fallback
 const DEFAULT_COMMUNITY_COINS = [
@@ -173,13 +174,21 @@ export const LaunchedCoinsView = ({ onStartNewCoin }) => {
                 <span>${coin.symbol}</span>
               </div>
 
-              {/* Artwork Box */}
+              {/* Artwork Box with 3D Tilted Card Interaction */}
               <div style={styles.imageBox}>
                 {coin.imageUrl ? (
-                  <img
-                    src={coin.imageUrl}
-                    alt={coin.name}
-                    style={styles.coinImg}
+                  <TiltedCard
+                    imageSrc={coin.imageUrl}
+                    altText={coin.name}
+                    captionText={`$${coin.symbol}`}
+                    containerHeight="100%"
+                    containerWidth="100%"
+                    imageHeight="100%"
+                    imageWidth="100%"
+                    rotateAmplitude={12}
+                    scaleOnHover={1.05}
+                    showMobileWarning={false}
+                    showTooltip={true}
                   />
                 ) : (
                   <div style={styles.placeholderImg}>
