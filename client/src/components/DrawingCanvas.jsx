@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
+import FuseButton from './FuseButton';
 import { 
   Pen, 
   Eraser, 
   Undo, 
   Download, 
-  Trash, 
   Shapes,
   ArrowRight,
   ArrowLeft
@@ -249,14 +249,23 @@ export const DrawingCanvas = ({ onImageExport, onNext, onBack, initialImage }) =
           >
             <Undo size={16} /> Undo
           </button>
-          <button 
-            type="button"
-            onClick={clearCanvas} 
-            style={styles.actionBtn}
-            title="Clear Canvas"
-          >
-            <Trash size={16} /> Clear
-          </button>
+          
+          <FuseButton
+            label="Clear"
+            undoLabel="Undo Clear"
+            doneLabel="Cleared!"
+            color="#1a1a1e"
+            background="#fef2f2"
+            fuseColor="#ef4444"
+            size="sm"
+            radius={8}
+            undoWindow={3500}
+            fuse="bottom"
+            fuseThickness={2.5}
+            commitOn="fuseEnd"
+            onCommit={clearCanvas}
+          />
+
           <button 
             type="button"
             onClick={downloadDrawing} 

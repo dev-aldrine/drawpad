@@ -21,7 +21,7 @@ export const TokenForm = ({
       <div style={styles.header}>
         <div>
           <h2 style={styles.title}>Token Details & Launch</h2>
-          <p style={styles.subtitle}>Set your coin's name, ticker, and initial buy before deploying to pump.fun.</p>
+          <p style={styles.subtitle}>Set your coin's name, ticker, and social links before deploying to pump.fun.</p>
         </div>
         <span style={styles.pumpfunTag}>
           pump.fun
@@ -101,46 +101,6 @@ export const TokenForm = ({
                 maxLength={500}
                 required
               />
-            </div>
-
-            {/* Initial Buy SOL */}
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>
-                Dev Initial Buy (SOL)
-              </label>
-              <div style={styles.inputWithIcon}>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0.00"
-                  value={formData.initialBuySol}
-                  onChange={(e) => onChange('initialBuySol', e.target.value)}
-                  style={styles.input}
-                />
-                <span style={styles.currencyTag}>SOL</span>
-              </div>
-              <span style={styles.helperText}>First buy on bonding curve</span>
-            </div>
-
-            {/* Slippage */}
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>
-                Slippage (%)
-              </label>
-              <div style={styles.inputWithIcon}>
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
-                  placeholder="10"
-                  value={formData.slippage}
-                  onChange={(e) => onChange('slippage', e.target.value)}
-                  style={styles.input}
-                />
-                <span style={styles.currencyTag}>%</span>
-              </div>
-              <span style={styles.helperText}>Recommended: 10%</span>
             </div>
 
             {/* Socials Divider */}

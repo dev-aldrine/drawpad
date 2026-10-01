@@ -161,8 +161,8 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
       num: '02',
       title: 'Configure Token Details',
       subtitle: 'Step 2 • Launch Specs',
-      desc: 'Give your hand-drawn coin a memorable Name, Ticker ($SYMBOL), and fun meme lore or description. You can also customize initial dev buy amount in SOL and slippage percentage.',
-      highlights: ['Custom Coin Name & Ticker', 'Optional initial dev buy on bonding curve', 'Social links (Twitter/X, Telegram, Website)'],
+      desc: 'Give your hand-drawn coin a memorable Name, Ticker ($SYMBOL), and funny meme lore. Add your social links (Twitter/X, Telegram, Website) to grow your community.',
+      highlights: ['Custom Coin Name & Ticker', 'Full meme description & lore', 'Social links (Twitter/X, Telegram, Website)'],
       color: 'var(--marker-green)',
       tapeColor: '#bbf7d0',
       icon: <Coins size={32} />

@@ -214,8 +214,6 @@ export const LaunchedCoinsView = ({ onStartNewCoin }) => {
                   <span style={styles.coinTicker}>${coin.symbol}</span>
                 </div>
 
-                <p style={styles.coinDesc}>{coin.description}</p>
-
                 <div style={styles.metaRow}>
                   <span style={styles.metaLabel}>Mint:</span>
                   <span style={styles.metaValue} title={coin.mintPublicKey}>
