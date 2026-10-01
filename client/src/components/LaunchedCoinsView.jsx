@@ -462,7 +462,7 @@ const styles = {
   },
   imageBox: {
     width: '100%',
-    height: '140px',
+    aspectRatio: '1 / 1',
     borderRadius: '10px',
     border: '2px solid #1a1a1e',
     overflow: 'hidden',
@@ -475,7 +475,8 @@ const styles = {
   coinImg: {
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
+    objectFit: 'contain',
+    backgroundColor: '#ffffff',
   },
   placeholderImg: {
     color: '#94a3b8',
