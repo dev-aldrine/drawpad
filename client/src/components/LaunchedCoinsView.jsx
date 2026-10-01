@@ -60,8 +60,11 @@ export const LaunchedCoinsView = ({ onStartNewCoin }) => {
         const text = await res.text();
         try {
           const data = JSON.parse(text);
-          if (data.coins && Array.isArray(data.coins) && data.coins.length > 0) {
-            setCoins(data.coins);
+          if (data.coins && Array.isArray(data.coins)) {
+            // Filter out old server mock SVG placeholders and keep real launched coins
+            const realLaunched = data.coins.filter((c) => !c.imageUrl?.startsWith('data:image/svg+xml') && !c.isSample);
+            // Put real launched coins first, followed by our 3 sample coins from /draw
+            setCoins([...realLaunched, ...DEFAULT_COMMUNITY_COINS]);
           }
         } catch (jsonErr) {
           console.warn('Backend response was not JSON, using local registry.');
