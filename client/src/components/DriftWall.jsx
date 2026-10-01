@@ -1,130 +1,32 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import './DriftWall.css';
 
-// Hand-drawn crypto meme SVG doodles (Pepe, Doge, Wojak, Bonk, Moon Rocket, Diamond Hands, Solana Cat, etc.)
-const createMemeSvg = (type, label, bg = '#fef08a') => {
-  let svgContent = '';
-  if (type === 'pepe') {
-    svgContent = `
-      <svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="80" fill="${bg}" />
-        <!-- Pepe Frog hand-drawn head -->
-        <path d="M 20,55 C 15,35 25,18 50,18 C 75,18 85,35 80,55 C 75,68 65,72 50,72 C 35,72 25,68 20,55 Z" fill="#86efac" stroke="#1a1a1e" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- Big Eyes -->
-        <ellipse cx="38" cy="30" rx="14" ry="12" fill="#ffffff" stroke="#1a1a1e" stroke-width="2.2"/>
-        <ellipse cx="62" cy="30" rx="14" ry="12" fill="#ffffff" stroke="#1a1a1e" stroke-width="2.2"/>
-        <circle cx="42" cy="30" r="4.5" fill="#1a1a1e"/>
-        <circle cx="58" cy="30" r="4.5" fill="#1a1a1e"/>
-        <circle cx="44" cy="28" r="1.5" fill="#ffffff"/>
-        <circle cx="60" cy="28" r="1.5" fill="#ffffff"/>
-        <!-- Sad Pepe Lips -->
-        <path d="M 26,52 C 38,62 62,62 74,52" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-        <path d="M 28,58 C 38,68 62,68 72,58" fill="none" stroke="#1a1a1e" stroke-width="2" stroke-linecap="round"/>
-        <text x="50" y="76" font-size="8" font-weight="bold" font-family="sans-serif" text-anchor="middle" fill="#1a1a1e">${label}</text>
-      </svg>
-    `;
-  } else if (type === 'doge') {
-    svgContent = `
-      <svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="80" fill="${bg}" />
-        <!-- Doge Head -->
-        <circle cx="50" cy="42" r="26" fill="#fed7aa" stroke="#1a1a1e" stroke-width="2.5"/>
-        <!-- Ears -->
-        <path d="M 28,26 L 34,8 L 46,20 Z" fill="#f97316" stroke="#1a1a1e" stroke-width="2.2"/>
-        <path d="M 72,26 L 66,8 L 54,20 Z" fill="#f97316" stroke="#1a1a1e" stroke-width="2.2"/>
-        <!-- Snout -->
-        <ellipse cx="50" cy="48" rx="12" ry="9" fill="#ffedd5" stroke="#1a1a1e" stroke-width="2"/>
-        <polygon points="46,44 54,44 50,50" fill="#1a1a1e"/>
-        <!-- Doge Side-Eye -->
-        <circle cx="39" cy="36" r="4" fill="#1a1a1e"/>
-        <circle cx="61" cy="36" r="4" fill="#1a1a1e"/>
-        <path d="M 46,55 Q 50,58 54,55" fill="none" stroke="#1a1a1e" stroke-width="2"/>
-        <text x="50" y="76" font-size="8" font-weight="bold" font-family="sans-serif" text-anchor="middle" fill="#1a1a1e">${label}</text>
-      </svg>
-    `;
-  } else if (type === 'wojak') {
-    svgContent = `
-      <svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="80" fill="${bg}" />
-        <!-- Wojak Bald Head -->
-        <ellipse cx="50" cy="40" rx="24" ry="28" fill="#f1f5f9" stroke="#1a1a1e" stroke-width="2.5"/>
-        <!-- Big Teary Eyes -->
-        <ellipse cx="40" cy="36" rx="6" ry="5" fill="#ffffff" stroke="#1a1a1e" stroke-width="2"/>
-        <ellipse cx="60" cy="36" rx="6" ry="5" fill="#ffffff" stroke="#1a1a1e" stroke-width="2"/>
-        <circle cx="41" cy="36" r="2.5" fill="#1a1a1e"/>
-        <circle cx="59" cy="36" r="2.5" fill="#1a1a1e"/>
-        <!-- Tears -->
-        <path d="M 40,42 Q 38,50 40,54" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- Sad mouth -->
-        <path d="M 38,58 Q 50,50 62,58" fill="none" stroke="#1a1a1e" stroke-width="2.2" stroke-linecap="round"/>
-        <text x="50" y="76" font-size="8" font-weight="bold" font-family="sans-serif" text-anchor="middle" fill="#1a1a1e">${label}</text>
-      </svg>
-    `;
-  } else if (type === 'rocket') {
-    svgContent = `
-      <svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="80" fill="${bg}" />
-        <!-- Rocket Body -->
-        <path d="M 50,12 C 60,25 65,45 62,58 L 38,58 C 35,45 40,25 50,12 Z" fill="#bae6fd" stroke="#1a1a1e" stroke-width="2.5"/>
-        <!-- Fins -->
-        <path d="M 38,48 L 26,58 L 38,58 Z" fill="#f87171" stroke="#1a1a1e" stroke-width="2"/>
-        <path d="M 62,48 L 74,58 L 62,58 Z" fill="#f87171" stroke="#1a1a1e" stroke-width="2"/>
-        <!-- Porthole -->
-        <circle cx="50" cy="34" r="6" fill="#ffffff" stroke="#1a1a1e" stroke-width="2"/>
-        <!-- Fire -->
-        <polygon points="44,59 50,72 56,59" fill="#f59e0b" stroke="#1a1a1e" stroke-width="1.8"/>
-        <text x="50" y="76" font-size="8" font-weight="bold" font-family="sans-serif" text-anchor="middle" fill="#1a1a1e">${label}</text>
-      </svg>
-    `;
-  } else if (type === 'bonk') {
-    svgContent = `
-      <svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="80" fill="${bg}" />
-        <!-- Shiba with Baseball Bat -->
-        <circle cx="44" cy="42" r="20" fill="#fde047" stroke="#1a1a1e" stroke-width="2.2"/>
-        <path d="M 28,30 L 32,18 L 40,26 Z" fill="#ca8a04" stroke="#1a1a1e" stroke-width="2"/>
-        <path d="M 56,30 L 52,18 L 44,26 Z" fill="#ca8a04" stroke="#1a1a1e" stroke-width="2"/>
-        <!-- Wooden Bat -->
-        <rect x="58" y="16" width="28" height="8" rx="4" transform="rotate(35 58 16)" fill="#d97706" stroke="#1a1a1e" stroke-width="2"/>
-        <!-- Eyes & Nose -->
-        <circle cx="36" cy="40" r="2.5" fill="#1a1a1e"/>
-        <circle cx="48" cy="40" r="2.5" fill="#1a1a1e"/>
-        <polygon points="40,46 44,46 42,49" fill="#1a1a1e"/>
-        <text x="50" y="76" font-size="8" font-weight="bold" font-family="sans-serif" text-anchor="middle" fill="#1a1a1e">${label}</text>
-      </svg>
-    `;
-  } else {
-    // Solana Diamond Hand
-    svgContent = `
-      <svg viewBox="0 0 100 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="80" fill="${bg}" />
-        <!-- Big Diamond -->
-        <polygon points="50,16 74,32 50,62 26,32" fill="#a7f3d0" stroke="#1a1a1e" stroke-width="2.5"/>
-        <polygon points="50,16 62,32 50,62 38,32" fill="#6ee7b7" stroke="#1a1a1e" stroke-width="1.8"/>
-        <line x1="26" y1="32" x2="74" y2="32" stroke="#1a1a1e" stroke-width="2"/>
-        <!-- Sparkles -->
-        <path d="M 20,20 L 22,24 L 20,28 L 18,24 Z" fill="#ca8a04"/>
-        <path d="M 80,48 L 82,52 L 80,56 L 78,52 Z" fill="#ca8a04"/>
-        <text x="50" y="76" font-size="8" font-weight="bold" font-family="sans-serif" text-anchor="middle" fill="#1a1a1e">${label}</text>
-      </svg>
-    `;
-  }
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svgContent.trim())}`;
-};
+// Import all doodle images from the draw folder
+import bitImg from '../../draw/bit.png';
+import dimondImg from '../../draw/dimond.png';
+import dogeImg from '../../draw/doge.jpeg';
+import dogwiphapImg from '../../draw/dogwiphap.jpeg';
+import pepeImg from '../../draw/pepe.jpeg';
+import pompfonImg from '../../draw/pompfon.png';
+import raketImg from '../../draw/raket.png';
+import solonoImg from '../../draw/solono.png';
+import spodermanImg from '../../draw/spoderman.jpeg';
+import stoankImg from '../../draw/stoank.png';
+import trompImg from '../../draw/tromp.jpeg';
 
-const MEME_DOODLE_ITEMS = [
-  { image: createMemeSvg('pepe', '$PEPE', '#fef08a'), title: 'Pepe Sketch' },
-  { image: createMemeSvg('doge', '$DOGE', '#fed7aa'), title: 'Doge Dood' },
-  { image: createMemeSvg('wojak', '$FEELS', '#fbcfe8'), title: 'Feels Guy' },
-  { image: createMemeSvg('bonk', '$BONK', '#fef9c3'), title: 'Bonk Dog' },
-  { image: createMemeSvg('rocket', '$PUMP', '#bae6fd'), title: 'Pump Rocket' },
-  { image: createMemeSvg('diamond', '$HODL', '#bbf7d0'), title: 'Diamond Hands' },
-  { image: createMemeSvg('pepe', '$FROG', '#bbf7d0'), title: 'Froggy' },
-  { image: createMemeSvg('doge', '$SHIB', '#fed7aa'), title: 'Shiba Inker' },
-  { image: createMemeSvg('wojak', '$MOON', '#bae6fd'), title: 'Moon Chad' },
-  { image: createMemeSvg('bonk', '$SMACK', '#fef08a'), title: 'Smack' },
-  { image: createMemeSvg('rocket', '$SOL', '#c4b5fd'), title: 'Solana Orbit' },
-  { image: createMemeSvg('diamond', '$WAGMI', '#fbcfe8'), title: 'Wagmi Gem' },
+// Map each image with its uppercase file name as the ticker
+const DRAW_FOLDER_ITEMS = [
+  { image: bitImg, ticker: '$BIT', title: 'bit' },
+  { image: dimondImg, ticker: '$DIMOND', title: 'dimond' },
+  { image: dogeImg, ticker: '$DOGE', title: 'doge' },
+  { image: dogwiphapImg, ticker: '$DOGWIPHAP', title: 'dogwiphap' },
+  { image: pepeImg, ticker: '$PEPE', title: 'pepe' },
+  { image: pompfonImg, ticker: '$POMPFON', title: 'pompfon' },
+  { image: raketImg, ticker: '$RAKET', title: 'raket' },
+  { image: solonoImg, ticker: '$SOLONO', title: 'solono' },
+  { image: spodermanImg, ticker: '$SPODERMAN', title: 'spoderman' },
+  { image: stoankImg, ticker: '$STOANK', title: 'stoank' },
+  { image: trompImg, ticker: '$TROMP', title: 'tromp' },
 ];
 
 const prefersReducedMotion = () =>
@@ -136,27 +38,27 @@ const columnFactor = (index, variance) => {
 };
 
 const DriftWall = ({
-  items = MEME_DOODLE_ITEMS,
-  columns = 6,
-  tileWidth = 170,
-  tileHeight = 120,
-  gap = 24,
-  radius = 12,
-  tilt = 14,
-  turn = -10,
-  roll = 0,
-  perspective = 1800,
-  depth = 60,
-  speed = 34,
+  items = DRAW_FOLDER_ITEMS,
+  columns = 8,
+  tileWidth = 220,
+  tileHeight = 220,
+  gap = 48,
+  radius = 14,
+  tilt = 16,
+  turn = -14,
+  roll = 2,
+  perspective = 2400,
+  depth = 30,
+  speed = 38,
   direction = 'up',
-  variance = 0.4,
-  parallax = 0.5,
+  variance = 0.45,
+  parallax = 0.6,
   pauseOnHover = false,
-  lift = 42,
-  fade = 0.45,
-  dim = 0.75,
+  lift = 140,
+  fade = 0.6,
+  dim = 1,
   grayscale = false,
-  overlayColor = '#fbf6ea',
+  overlayColor = '#060010',
   className = '',
   style
 }) => {
@@ -345,6 +247,11 @@ const DriftWall = ({
     const inner = (
       <span className="drift-wall__inner">
         <img src={item.image} alt={item.title ?? ''} loading="lazy" decoding="async" draggable={false} />
+        {item.ticker && (
+          <span className="drift-wall__ticker-badge">
+            {item.ticker}
+          </span>
+        )}
         <span className="drift-wall__overlay" aria-hidden="true" />
       </span>
     );

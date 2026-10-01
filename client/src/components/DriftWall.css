@@ -91,11 +91,31 @@
   -webkit-user-drag: none;
 }
 
+.drift-wall__ticker-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fef08a;
+  border: 1.5px solid #1a1a1e;
+  color: #1a1a1e;
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 6px;
+  box-shadow: 1.5px 1.5px 0px #1a1a1e;
+  pointer-events: none;
+  z-index: 3;
+  white-space: nowrap;
+}
+
 .drift-wall__overlay {
   position: absolute;
   inset: 0;
   background: var(--dw-overlay);
-  opacity: 0.25;
+  opacity: 0.15;
   pointer-events: none;
   transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
