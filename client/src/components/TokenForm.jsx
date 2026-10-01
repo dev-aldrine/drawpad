@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Coins, HelpCircle, ExternalLink, Globe, MessageCircle } from 'lucide-react';
+import { Coins, Sparkles, Globe, MessageCircle } from 'lucide-react';
 
 export const TokenForm = ({
   formData,
@@ -10,14 +10,19 @@ export const TokenForm = ({
   isWalletConnected
 }) => {
   return (
-    <div style={styles.container} className="glass-panel">
+    <div style={styles.container} className="sketch-card sketch-card-tilted-right">
+      {/* Tape decoration */}
+      <div style={styles.tape}>
+        <span>📋 LAUNCHPAD SPECS</span>
+      </div>
+
       <div style={styles.header}>
         <div style={styles.badge}>
-          <Coins size={16} color="#06b6d4" />
-          <span>Coin Information</span>
+          <Coins size={20} color="#1a1a1e" />
+          <span>Coin Profile 🚀</span>
         </div>
-        <span style={styles.pumpfunBadge}>
-          ⚡ Pump.fun Launchpad
+        <span style={styles.pumpfunTag}>
+          ⚡ pump.fun
         </span>
       </div>
 
@@ -29,7 +34,7 @@ export const TokenForm = ({
           </label>
           <input
             type="text"
-            placeholder="e.g. Pepe The Painter"
+            placeholder="e.g. Doodle Dog"
             value={formData.name}
             onChange={(e) => onChange('name', e.target.value)}
             style={styles.input}
@@ -41,14 +46,14 @@ export const TokenForm = ({
         {/* Token Ticker */}
         <div style={styles.inputGroup}>
           <label style={styles.label}>
-            Coin Ticker / Symbol <span style={styles.required}>*</span>
+            Ticker / Symbol <span style={styles.required}>*</span>
           </label>
           <input
             type="text"
-            placeholder="e.g. DRAW"
+            placeholder="e.g. DOODLE"
             value={formData.symbol}
             onChange={(e) => onChange('symbol', e.target.value.toUpperCase())}
-            style={{ ...styles.input, textTransform: 'uppercase' }}
+            style={{ ...styles.input, textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}
             maxLength={10}
             required
           />
@@ -57,10 +62,10 @@ export const TokenForm = ({
         {/* Description */}
         <div style={styles.inputGroupFull}>
           <label style={styles.label}>
-            Description <span style={styles.required}>*</span>
+            Description / Lore <span style={styles.required}>*</span>
           </label>
           <textarea
-            placeholder="Tell the Solana world about your hand-drawn coin..."
+            placeholder="Write a funny story or lore for your hand-drawn coin..."
             value={formData.description}
             onChange={(e) => onChange('description', e.target.value)}
             style={styles.textarea}
@@ -73,7 +78,7 @@ export const TokenForm = ({
         {/* Initial Buy SOL */}
         <div style={styles.inputGroup}>
           <label style={styles.label}>
-            Initial Dev Buy (SOL)
+            Dev Buy (SOL)
           </label>
           <div style={styles.inputWithIcon}>
             <input
@@ -87,7 +92,7 @@ export const TokenForm = ({
             />
             <span style={styles.currencyTag}>SOL</span>
           </div>
-          <span style={styles.helperText}>Optional: Buy your own coin upon creation</span>
+          <span style={styles.helperText}>First buy on bonding curve</span>
         </div>
 
         {/* Slippage */}
@@ -107,21 +112,21 @@ export const TokenForm = ({
             />
             <span style={styles.currencyTag}>%</span>
           </div>
-          <span style={styles.helperText}>Default: 10% recommended for launch</span>
+          <span style={styles.helperText}>Recommended: 10%</span>
         </div>
 
         {/* Socials Divider */}
         <div style={styles.divider}>
-          <span>Social Links (Optional)</span>
+          <span>🔗 Social Links (Optional)</span>
         </div>
 
         {/* Twitter / X */}
         <div style={styles.inputGroupFull}>
           <div style={styles.socialInputWrapper}>
-            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#38bdf8' }}>𝕏</span>
+            <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#1a1a1e' }}>𝕏</span>
             <input
               type="url"
-              placeholder="Twitter / X Link (https://x.com/...)"
+              placeholder="Twitter / X (https://x.com/...)"
               value={formData.twitter}
               onChange={(e) => onChange('twitter', e.target.value)}
               style={styles.socialInput}
@@ -132,7 +137,7 @@ export const TokenForm = ({
         {/* Telegram */}
         <div style={styles.inputGroupFull}>
           <div style={styles.socialInputWrapper}>
-            <MessageCircle size={15} color="#22c55e" />
+            <MessageCircle size={17} color="#16a34a" />
             <input
               type="url"
               placeholder="Telegram Link (https://t.me/...)"
@@ -146,7 +151,7 @@ export const TokenForm = ({
         {/* Website */}
         <div style={styles.inputGroupFull}>
           <div style={styles.socialInputWrapper}>
-            <Globe size={15} color="#a855f7" />
+            <Globe size={17} color="#0284c7" />
             <input
               type="url"
               placeholder="Website Link (https://...)"
@@ -161,34 +166,33 @@ export const TokenForm = ({
       {/* Status Message */}
       {statusMessage && (
         <div style={styles.statusBox}>
-          <span style={styles.statusSpinner}>✨</span>
+          <span style={{ fontSize: '18px' }}>✏️</span>
           <span>{statusMessage}</span>
         </div>
       )}
 
-      {/* Action Button */}
+      {/* Launch Action Button */}
       <button
         type="button"
         onClick={onLaunch}
         disabled={loading || !formData.name || !formData.symbol || !formData.description}
-        className="glow-btn"
+        className="sketch-btn sketch-btn-green"
         style={styles.launchButton}
       >
         {loading ? (
           <>
-            <span style={styles.loaderIcon}>⏳</span>
-            <span>Launching to Pump.fun...</span>
+            <span>⏳ Inscribing on Solana...</span>
           </>
         ) : (
           <>
-            <Sparkles size={18} />
-            <span>{!isWalletConnected ? 'Connect Phantom to Launch' : 'Create & Launch Coin'}</span>
+            <Sparkles size={20} />
+            <span>{!isWalletConnected ? '👉 Connect Phantom to Launch' : '🚀 Mint & Launch to Pump.fun'}</span>
           </>
         )}
       </button>
 
       <div style={styles.footerNote}>
-        <span>🔒 Powered by <strong>PumpPortal Trade API</strong> & <strong>pump.fun</strong></span>
+        <span>⚡ Hand-signed on Phantom • Verified by PumpPortal</span>
       </div>
     </div>
   );
@@ -199,81 +203,97 @@ const styles = {
     padding: '24px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
-    maxWidth: '560px',
+    gap: '16px',
+    maxWidth: '540px',
     width: '100%',
+    position: 'relative',
+  },
+  tape: {
+    position: 'absolute',
+    top: '-14px',
+    left: '50%',
+    transform: 'translateX(-50%) rotate(1deg)',
+    background: '#bbf7d0',
+    border: '2px dashed #1a1a1e',
+    padding: '2px 14px',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '11px',
+    fontWeight: '700',
+    letterSpacing: '0.08em',
+    color: '#1a1a1e',
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '8px',
+    marginTop: '6px',
   },
   badge: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    fontSize: '14px',
+    fontSize: '20px',
     fontWeight: '700',
-    color: '#e2e8f0',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
+    color: '#1a1a1e',
+    fontFamily: 'var(--font-heading)',
   },
-  pumpfunBadge: {
-    fontSize: '12px',
+  pumpfunTag: {
+    fontSize: '13px',
     fontWeight: '700',
-    color: '#10b981',
-    background: 'rgba(16, 185, 129, 0.12)',
-    border: '1px solid rgba(16, 185, 129, 0.3)',
-    borderRadius: '20px',
-    padding: '4px 10px',
+    color: '#1a1a1e',
+    background: '#fed7aa',
+    border: '2px solid #1a1a1e',
+    borderRadius: '8px',
+    padding: '2px 8px',
+    boxShadow: '1.5px 1.5px 0px #1a1a1e',
+    fontFamily: 'var(--font-mono)',
   },
   formGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '14px',
+    gap: '12px',
   },
   inputGroup: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px',
+    gap: '4px',
   },
   inputGroupFull: {
     gridColumn: '1 / -1',
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px',
+    gap: '4px',
   },
   label: {
-    fontSize: '13px',
-    fontWeight: '600',
-    color: '#cbd5e1',
+    fontSize: '16px',
+    fontWeight: '700',
+    color: '#1a1a1e',
   },
   required: {
-    color: '#ef4444',
+    color: '#dc2626',
   },
   input: {
-    background: 'var(--bg-input)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '10px',
-    padding: '10px 14px',
-    color: '#fff',
-    fontSize: '14px',
-    fontFamily: 'inherit',
+    background: '#f8fafc',
+    border: '2px solid #1a1a1e',
+    borderRadius: '8px',
+    padding: '8px 12px',
+    color: '#1a1a1e',
+    fontSize: '16px',
+    fontFamily: 'var(--font-handwriting)',
     outline: 'none',
-    transition: 'border-color 0.2s',
+    boxShadow: 'inset 1.5px 1.5px 0px rgba(0,0,0,0.05)',
   },
   textarea: {
-    background: 'var(--bg-input)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '10px',
-    padding: '10px 14px',
-    color: '#fff',
-    fontSize: '14px',
-    fontFamily: 'inherit',
+    background: '#f8fafc',
+    border: '2px solid #1a1a1e',
+    borderRadius: '8px',
+    padding: '8px 12px',
+    color: '#1a1a1e',
+    fontSize: '16px',
+    fontFamily: 'var(--font-handwriting)',
     outline: 'none',
     resize: 'vertical',
+    boxShadow: 'inset 1.5px 1.5px 0px rgba(0,0,0,0.05)',
   },
   inputWithIcon: {
     position: 'relative',
@@ -282,63 +302,67 @@ const styles = {
   },
   currencyTag: {
     position: 'absolute',
-    right: '12px',
+    right: '10px',
     fontSize: '12px',
     fontWeight: '700',
-    color: '#64748b',
+    color: '#475569',
     fontFamily: 'var(--font-mono)',
   },
   helperText: {
-    fontSize: '11px',
+    fontSize: '13px',
     color: '#64748b',
   },
   divider: {
     gridColumn: '1 / -1',
-    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-    paddingTop: '10px',
-    marginTop: '6px',
-    fontSize: '12px',
-    fontWeight: '600',
-    color: '#94a3b8',
+    borderTop: '2px dashed #cbd5e1',
+    paddingTop: '8px',
+    marginTop: '4px',
+    fontSize: '15px',
+    fontWeight: '700',
+    color: '#334155',
   },
   socialInputWrapper: {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-    background: 'var(--bg-input)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '10px',
-    padding: '0 12px',
+    background: '#f8fafc',
+    border: '2px solid #1a1a1e',
+    borderRadius: '8px',
+    padding: '0 10px',
   },
   socialInput: {
     flex: 1,
     background: 'transparent',
     border: 'none',
-    padding: '10px 0',
-    color: '#fff',
-    fontSize: '13px',
+    padding: '8px 0',
+    color: '#1a1a1e',
+    fontSize: '15px',
+    fontFamily: 'var(--font-handwriting)',
     outline: 'none',
   },
   statusBox: {
-    padding: '12px 16px',
-    background: 'rgba(6, 182, 212, 0.1)',
-    border: '1px solid rgba(6, 182, 212, 0.3)',
-    borderRadius: '10px',
-    fontSize: '13px',
-    color: '#38bdf8',
+    padding: '10px 14px',
+    background: '#fef08a',
+    border: '2px solid #1a1a1e',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: '700',
+    color: '#1a1a1e',
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    gap: '8px',
+    boxShadow: '2px 2px 0px #1a1a1e',
   },
   launchButton: {
-    padding: '16px',
-    fontSize: '16px',
+    padding: '14px',
+    fontSize: '20px',
     width: '100%',
-    letterSpacing: '0.02em',
+    marginTop: '4px',
   },
   footerNote: {
     textAlign: 'center',
-    fontSize: '12px',
+    fontSize: '14px',
     color: '#64748b',
+    fontFamily: 'var(--font-handwriting)',
   }
 };

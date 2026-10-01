@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, CheckCircle2, Copy, Rocket, RefreshCw } from 'lucide-react';
+import { ExternalLink, CheckCircle, Copy, Rocket, RotateCcw } from 'lucide-react';
 
 export const SuccessModal = ({ data, onClose, onReset }) => {
   const [copied, setCopied] = React.useState(false);
@@ -16,28 +16,35 @@ export const SuccessModal = ({ data, onClose, onReset }) => {
 
   return (
     <div style={styles.overlay}>
-      <div style={styles.modal} className="glass-panel">
-        <div style={styles.iconContainer}>
-          <CheckCircle2 size={56} color="#10b981" />
+      <div style={styles.modal} className="sketch-card">
+        {/* Tape header */}
+        <div style={styles.tape}>
+          <span>🎉 LAUNCH SUCCESSFUL</span>
         </div>
 
-        <h2 style={styles.title}>Coin Launched to Pump.fun! 🚀</h2>
+        <div style={styles.iconContainer}>
+          <span style={{ fontSize: '48px' }}>🚀🎨</span>
+        </div>
+
+        <h2 style={styles.title}>Your Coin is Live on Pump.fun!</h2>
         <p style={styles.subtitle}>
-          Your hand-drawn coin is now live on Solana bonding curve!
+          Your hand-drawn masterpiece is now tradable on Solana bonding curve.
         </p>
 
         {data.previewImage && (
           <div style={styles.tokenImageWrapper}>
             <img src={data.previewImage} alt="Token Artwork" style={styles.tokenImage} />
             <div style={styles.tokenMeta}>
-              <h3>{data.name} (${data.symbol})</h3>
+              <h3 style={{ fontSize: '22px', fontFamily: 'var(--font-heading)' }}>
+                {data.name} <span style={{ background: '#fef08a', padding: '0 6px', border: '1px solid #1a1a1e', borderRadius: '4px' }}>${data.symbol}</span>
+              </h3>
             </div>
           </div>
         )}
 
         <div style={styles.detailsBox}>
           <div style={styles.detailRow}>
-            <span style={styles.detailLabel}>Mint Address:</span>
+            <span style={styles.detailLabel}>Mint Key:</span>
             <div style={styles.mintCopyRow}>
               <span style={styles.mintAddress}>
                 {data.mintPublicKey ? `${data.mintPublicKey.slice(0, 8)}...${data.mintPublicKey.slice(-8)}` : 'Generating...'}
@@ -51,14 +58,14 @@ export const SuccessModal = ({ data, onClose, onReset }) => {
 
           {data.signature && (
             <div style={styles.detailRow}>
-              <span style={styles.detailLabel}>Tx Signature:</span>
+              <span style={styles.detailLabel}>Solana Tx:</span>
               <a 
                 href={`https://solscan.io/tx/${data.signature}`}
                 target="_blank" 
                 rel="noreferrer"
                 style={styles.link}
               >
-                View on Solscan <ExternalLink size={13} />
+                View Solscan <ExternalLink size={14} />
               </a>
             </div>
           )}
@@ -69,19 +76,19 @@ export const SuccessModal = ({ data, onClose, onReset }) => {
             href={data.mintPublicKey ? `https://pump.fun/${data.mintPublicKey}` : 'https://pump.fun'}
             target="_blank"
             rel="noreferrer"
-            className="glow-btn"
+            className="sketch-btn sketch-btn-green"
             style={styles.pumpFunBtn}
           >
-            <Rocket size={18} />
-            <span>Open on Pump.fun</span>
+            <span>👉 View on pump.fun</span>
           </a>
 
           <button
             type="button"
             onClick={onReset}
+            className="sketch-btn"
             style={styles.secondaryBtn}
           >
-            <RefreshCw size={16} />
+            <RotateCcw size={16} />
             <span>Draw Another Coin</span>
           </button>
         </div>
@@ -97,8 +104,8 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    backdropFilter: 'blur(8px)',
+    backgroundColor: 'rgba(26, 26, 30, 0.65)',
+    backdropFilter: 'blur(4px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -108,43 +115,59 @@ const styles = {
   modal: {
     maxWidth: '480px',
     width: '100%',
-    padding: '32px',
+    padding: '36px 28px 28px 28px',
     textAlign: 'center',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '16px',
-    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.3)',
-    border: '1px solid rgba(16, 185, 129, 0.4)',
+    gap: '14px',
+    backgroundColor: '#ffffff',
+    position: 'relative',
+  },
+  tape: {
+    position: 'absolute',
+    top: '-14px',
+    left: '50%',
+    transform: 'translateX(-50%) rotate(-1deg)',
+    background: '#fef08a',
+    border: '2px dashed #1a1a1e',
+    padding: '2px 16px',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '12px',
+    fontWeight: '700',
+    color: '#1a1a1e',
   },
   iconContainer: {
-    animation: 'bounce 1s infinite alternate',
+    margin: '4px 0',
   },
   title: {
-    fontSize: '24px',
+    fontSize: '26px',
     fontWeight: '800',
-    color: '#f8fafc',
+    color: '#1a1a1e',
+    fontFamily: 'var(--font-heading)',
+    lineHeight: '1.2',
   },
   subtitle: {
-    fontSize: '14px',
-    color: '#94a3b8',
+    fontSize: '16px',
+    color: '#475569',
   },
   tokenImageWrapper: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
-    padding: '12px 18px',
-    background: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: '14px',
+    gap: '14px',
+    padding: '10px 14px',
+    background: '#f8fafc',
+    borderRadius: '10px',
     width: '100%',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    border: '2px solid #1a1a1e',
   },
   tokenImage: {
-    width: '64px',
-    height: '64px',
-    borderRadius: '12px',
+    width: '60px',
+    height: '60px',
+    borderRadius: '8px',
     objectFit: 'cover',
-    border: '2px solid #10b981',
+    border: '2px solid #1a1a1e',
+    backgroundColor: '#ffffff',
   },
   tokenMeta: {
     textAlign: 'left',
@@ -154,75 +177,72 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',
-    background: 'var(--bg-input)',
-    padding: '14px',
-    borderRadius: '12px',
-    border: '1px solid rgba(255, 255, 255, 0.06)',
+    background: '#f8fafc',
+    padding: '12px',
+    borderRadius: '10px',
+    border: '2px dashed #94a3b8',
   },
   detailRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    fontSize: '13px',
+    fontSize: '15px',
   },
   detailLabel: {
     color: '#64748b',
+    fontWeight: '700',
   },
   mintCopyRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: '6px',
   },
   mintAddress: {
     fontFamily: 'var(--font-mono)',
-    color: '#38bdf8',
-    fontSize: '12px',
+    color: '#1a1a1e',
+    fontSize: '13px',
+    fontWeight: '700',
   },
   copyBtn: {
-    background: 'rgba(255, 255, 255, 0.08)',
-    border: 'none',
-    color: '#cbd5e1',
+    background: '#ffffff',
+    border: '1.5px solid #1a1a1e',
+    color: '#1a1a1e',
     borderRadius: '6px',
-    padding: '4px 8px',
-    fontSize: '11px',
+    padding: '2px 8px',
+    fontSize: '12px',
+    fontWeight: '700',
+    fontFamily: 'var(--font-handwriting)',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
+    boxShadow: '1px 1px 0px #1a1a1e',
   },
   link: {
-    color: '#10b981',
-    textDecoration: 'none',
+    color: '#16a34a',
+    textDecoration: 'underline',
+    fontWeight: '700',
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
-    fontSize: '12px',
+    fontSize: '14px',
   },
   buttonGroup: {
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',
     width: '100%',
-    marginTop: '8px',
+    marginTop: '6px',
   },
   pumpFunBtn: {
-    padding: '14px',
     textDecoration: 'none',
     width: '100%',
-    fontSize: '15px',
+    padding: '12px',
+    fontSize: '18px',
   },
   secondaryBtn: {
-    background: 'rgba(255, 255, 255, 0.06)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    color: '#e2e8f0',
-    borderRadius: '12px',
-    padding: '12px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    fontSize: '14px',
-    fontWeight: '600',
+    width: '100%',
+    padding: '10px',
+    fontSize: '16px',
   }
 };

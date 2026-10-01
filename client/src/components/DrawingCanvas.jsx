@@ -5,30 +5,33 @@ import {
   RotateCcw, 
   Download, 
   Trash2, 
-  Palette, 
-  Sparkles,
   Smile,
-  Rocket,
-  Flame,
-  Zap,
-  DollarSign,
-  Crown
+  Sparkles,
+  Highlighter
 } from 'lucide-react';
 
 const PRESET_COLORS = [
-  '#000000', '#ffffff', '#ef4444', '#f97316', 
-  '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', 
-  '#8b5cf6', '#ec4899', '#78350f', '#64748b'
+  '#1a1a1e', // Pencil Black
+  '#475569', // Slate Gray
+  '#dc2626', // Crayon Red
+  '#ea580c', // Orange
+  '#ca8a04', // Mustard Gold
+  '#16a34a', // Grass Green
+  '#0284c7', // Sky Blue
+  '#7c3aed', // Purple Crayon
+  '#db2777', // Marker Pink
+  '#854d0e', // Brown Pastel
+  '#ffffff', // Chalk White
 ];
 
-const STICKERS = ['🚀', '💎', '🐸', '🐕', '🌙', '🔥', '👑', '💰', '⚡', '🛸', '🥑', '🎯'];
+const STICKERS = ['🐸', '🚀', '🐕', '🌙', '💎', '🔥', '👑', '💰', '⚡', '🥑', '🎯', '🍌'];
 
 export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [tool, setTool] = useState('brush'); // brush, eraser, stamp
-  const [color, setColor] = useState('#10b981');
-  const [brushSize, setBrushSize] = useState(6);
+  const [color, setColor] = useState('#1a1a1e');
+  const [brushSize, setBrushSize] = useState(5);
   const [activeSticker, setActiveSticker] = useState('🐸');
   const [history, setHistory] = useState([]);
   const [historyStep, setHistoryStep] = useState(-1);
@@ -38,7 +41,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     
-    // Set white background by default for clean memecoin PFP
+    // Clear with clean canvas background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
@@ -56,7 +59,6 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
     });
     setHistoryStep((prev) => prev + 1);
     
-    // Export data URL to parent
     if (onImageExport) {
       onImageExport(snapshot);
     }
@@ -111,7 +113,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
     const ctx = canvas.getContext('2d');
 
     if (tool === 'stamp') {
-      ctx.font = `${brushSize * 5}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+      ctx.font = `${brushSize * 6}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(activeSticker, x, y);
@@ -125,7 +127,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : color;
-    ctx.lineWidth = tool === 'eraser' ? brushSize * 3 : brushSize;
+    ctx.lineWidth = tool === 'eraser' ? brushSize * 4 : brushSize;
   };
 
   const draw = (e) => {
@@ -151,17 +153,22 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
   const downloadDrawing = () => {
     const canvas = canvasRef.current;
     const link = document.createElement('a');
-    link.download = 'drawpad-token-pfp.png';
+    link.download = 'hand-drawn-coin.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
 
   return (
-    <div style={styles.container} className="glass-panel">
+    <div style={styles.container} className="sketch-card sketch-card-tilted-left">
+      {/* Tape decoration at top */}
+      <div style={styles.tape}>
+        <span>📌 SKETCHPAD CANVASS</span>
+      </div>
+
       <div style={styles.header}>
         <div style={styles.badge}>
-          <PenTool size={16} color="#10b981" />
-          <span>Draw Your Coin Logo</span>
+          <PenTool size={18} color="#1a1a1e" />
+          <span>Draw Your Coin PFP ✍️</span>
         </div>
         <div style={styles.actions}>
           <button 
@@ -171,7 +178,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             style={styles.actionBtn}
             title="Undo"
           >
-            <RotateCcw size={16} />
+            <RotateCcw size={16} /> Undo
           </button>
           <button 
             type="button"
@@ -179,34 +186,36 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             style={styles.actionBtn}
             title="Clear Canvas"
           >
-            <Trash2 size={16} />
+            <Trash2 size={16} /> Clear
           </button>
           <button 
             type="button"
             onClick={downloadDrawing} 
             style={styles.actionBtn}
-            title="Download PNG"
+            title="Save PNG"
           >
-            <Download size={16} />
+            <Download size={16} /> Save
           </button>
         </div>
       </div>
 
       {/* Canvas Area */}
-      <div style={styles.canvasWrapper}>
-        <canvas
-          ref={canvasRef}
-          width={500}
-          height={500}
-          style={styles.canvas}
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseLeave={stopDrawing}
-          onTouchStart={startDrawing}
-          onTouchMove={draw}
-          onTouchEnd={stopDrawing}
-        />
+      <div style={styles.canvasOuter}>
+        <div style={styles.canvasInner}>
+          <canvas
+            ref={canvasRef}
+            width={500}
+            height={500}
+            style={styles.canvas}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={stopDrawing}
+          />
+        </div>
       </div>
 
       {/* Toolbar */}
@@ -217,21 +226,19 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             type="button"
             style={{
               ...styles.toolBtn,
-              background: tool === 'brush' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-              borderColor: tool === 'brush' ? '#10b981' : 'rgba(255,255,255,0.1)',
-              color: tool === 'brush' ? '#10b981' : '#94a3b8'
+              background: tool === 'brush' ? 'var(--marker-yellow)' : '#ffffff',
+              boxShadow: tool === 'brush' ? '2px 2px 0px #1a1a1e' : 'none'
             }}
             onClick={() => setTool('brush')}
           >
-            <PenTool size={16} /> Brush
+            <PenTool size={16} /> Pencil / Brush
           </button>
           <button
             type="button"
             style={{
               ...styles.toolBtn,
-              background: tool === 'eraser' ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
-              borderColor: tool === 'eraser' ? '#ef4444' : 'rgba(255,255,255,0.1)',
-              color: tool === 'eraser' ? '#ef4444' : '#94a3b8'
+              background: tool === 'eraser' ? 'var(--marker-pink)' : '#ffffff',
+              boxShadow: tool === 'eraser' ? '2px 2px 0px #1a1a1e' : 'none'
             }}
             onClick={() => setTool('eraser')}
           >
@@ -241,9 +248,8 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
             type="button"
             style={{
               ...styles.toolBtn,
-              background: tool === 'stamp' ? 'rgba(139, 92, 246, 0.2)' : 'transparent',
-              borderColor: tool === 'stamp' ? '#8b5cf6' : 'rgba(255,255,255,0.1)',
-              color: tool === 'stamp' ? '#8b5cf6' : '#94a3b8'
+              background: tool === 'stamp' ? 'var(--marker-cyan)' : '#ffffff',
+              boxShadow: tool === 'stamp' ? '2px 2px 0px #1a1a1e' : 'none'
             }}
             onClick={() => setTool('stamp')}
           >
@@ -253,18 +259,18 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
 
         {/* Brush Size Slider */}
         <div style={styles.sliderGroup}>
-          <span style={styles.sliderLabel}>Size: {brushSize}px</span>
+          <span style={styles.sliderLabel}>Stroke Size: <strong>{brushSize}px</strong></span>
           <input
             type="range"
             min="2"
-            max="40"
+            max="36"
             value={brushSize}
             onChange={(e) => setBrushSize(Number(e.target.value))}
             style={styles.slider}
           />
         </div>
 
-        {/* Palette / Sticker Tray */}
+        {/* Color Palette / Sticker Tray */}
         {tool === 'stamp' ? (
           <div style={styles.stickerTray}>
             {STICKERS.map((stk) => (
@@ -273,8 +279,8 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
                 type="button"
                 style={{
                   ...styles.stickerBtn,
-                  background: activeSticker === stk ? 'rgba(139, 92, 246, 0.3)' : 'rgba(255,255,255,0.05)',
-                  transform: activeSticker === stk ? 'scale(1.15)' : 'scale(1)'
+                  background: activeSticker === stk ? 'var(--marker-yellow)' : '#ffffff',
+                  transform: activeSticker === stk ? 'scale(1.15) rotate(-3deg)' : 'scale(1)'
                 }}
                 onClick={() => setActiveSticker(stk)}
               >
@@ -294,7 +300,7 @@ export const DrawingCanvas = ({ onImageExport, previewUrl }) => {
                 style={{
                   ...styles.colorCircle,
                   backgroundColor: c,
-                  outline: color === c && tool === 'brush' ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,0.2)'
+                  outline: color === c && tool === 'brush' ? '3px solid #1a1a1e' : '1.5px solid #94a3b8'
                 }}
               />
             ))}
@@ -321,48 +327,75 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
-    maxWidth: '560px',
+    maxWidth: '540px',
     width: '100%',
+    position: 'relative',
+  },
+  tape: {
+    position: 'absolute',
+    top: '-14px',
+    left: '50%',
+    transform: 'translateX(-50%) rotate(-1deg)',
+    background: '#fef08a',
+    border: '2px dashed #1a1a1e',
+    padding: '2px 14px',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '11px',
+    fontWeight: '700',
+    letterSpacing: '0.08em',
+    color: '#1a1a1e',
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: '6px',
+    flexWrap: 'wrap',
+    gap: '8px',
   },
   badge: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    fontSize: '14px',
+    fontSize: '20px',
     fontWeight: '700',
-    color: '#e2e8f0',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
+    color: '#1a1a1e',
+    fontFamily: 'var(--font-heading)',
   },
   actions: {
     display: 'flex',
-    gap: '8px',
+    gap: '6px',
   },
   actionBtn: {
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    color: '#cbd5e1',
+    background: '#ffffff',
+    border: '2px solid #1a1a1e',
+    color: '#1a1a1e',
     borderRadius: '8px',
-    padding: '8px',
+    padding: '4px 10px',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all 0.2s',
+    gap: '4px',
+    fontSize: '14px',
+    fontWeight: '700',
+    fontFamily: 'var(--font-handwriting)',
+    boxShadow: '1.5px 1.5px 0px #1a1a1e',
+    transition: 'all 0.1s',
   },
-  canvasWrapper: {
+  canvasOuter: {
+    padding: '10px',
+    background: '#f8fafc',
+    border: '2.5px solid #1a1a1e',
+    borderRadius: '12px',
+    boxShadow: 'inset 2px 2px 0px rgba(0,0,0,0.05)',
+  },
+  canvasInner: {
     position: 'relative',
     width: '100%',
     aspectRatio: '1 / 1',
-    borderRadius: '16px',
+    borderRadius: '8px',
     overflow: 'hidden',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-    border: '2px dashed rgba(255, 255, 255, 0.15)',
+    border: '1.5px dashed #64748b',
     backgroundColor: '#ffffff',
   },
   canvas: {
@@ -375,7 +408,8 @@ const styles = {
   toolbar: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '14px',
+    gap: '12px',
+    marginTop: '4px',
   },
   toolModeGroup: {
     display: 'grid',
@@ -383,34 +417,33 @@ const styles = {
     gap: '8px',
   },
   toolBtn: {
-    border: '1px solid',
-    borderRadius: '10px',
-    padding: '10px 12px',
+    border: '2px solid #1a1a1e',
+    borderRadius: '8px',
+    padding: '8px 10px',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: '6px',
-    fontWeight: '600',
-    fontSize: '13px',
-    transition: 'all 0.2s',
+    fontWeight: '700',
+    fontSize: '16px',
+    fontFamily: 'var(--font-handwriting)',
+    transition: 'all 0.12s',
   },
   sliderGroup: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: '12px',
-    padding: '0 4px',
   },
   sliderLabel: {
-    fontSize: '13px',
-    color: '#94a3b8',
-    fontFamily: 'var(--font-mono)',
-    minWidth: '90px',
+    fontSize: '16px',
+    color: '#1a1a1e',
+    minWidth: '130px',
   },
   slider: {
     flex: 1,
-    accentColor: '#10b981',
+    accentColor: '#1a1a1e',
     cursor: 'pointer',
   },
   paletteRow: {
@@ -419,34 +452,43 @@ const styles = {
     gap: '8px',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: '4px',
+    padding: '6px',
+    background: '#f8fafc',
+    border: '2px solid #1a1a1e',
+    borderRadius: '10px',
   },
   colorCircle: {
-    width: '28px',
-    height: '28px',
+    width: '26px',
+    height: '26px',
     borderRadius: '50%',
     cursor: 'pointer',
-    transition: 'transform 0.15s ease',
+    transition: 'transform 0.1s ease',
   },
   customColorPicker: {
-    width: '32px',
-    height: '32px',
-    borderRadius: '50%',
-    border: 'none',
+    width: '28px',
+    height: '28px',
+    borderRadius: '6px',
+    border: '2px solid #1a1a1e',
     cursor: 'pointer',
     background: 'none',
+    padding: 0,
   },
   stickerTray: {
     display: 'grid',
     gridTemplateColumns: 'repeat(6, 1fr)',
     gap: '8px',
+    background: '#f8fafc',
+    border: '2px solid #1a1a1e',
+    borderRadius: '10px',
+    padding: '8px',
   },
   stickerBtn: {
     fontSize: '22px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '10px',
-    padding: '6px',
+    border: '2px solid #1a1a1e',
+    borderRadius: '8px',
+    padding: '4px',
     cursor: 'pointer',
-    transition: 'all 0.15s ease',
+    boxShadow: '1.5px 1.5px 0px #1a1a1e',
+    transition: 'all 0.1s ease',
   }
 };

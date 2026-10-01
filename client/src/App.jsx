@@ -6,7 +6,7 @@ import confetti from 'canvas-confetti';
 import { DrawingCanvas } from './components/DrawingCanvas';
 import { TokenForm } from './components/TokenForm';
 import { SuccessModal } from './components/SuccessModal';
-import { Sparkles, Palette, Zap, ShieldCheck, Flame, ExternalLink, Activity } from 'lucide-react';
+import { Sparkles, PenTool, Zap, ShieldCheck, HelpCircle } from 'lucide-react';
 
 export function App() {
   const { publicKey, signTransaction, connected } = useWallet();
@@ -38,7 +38,7 @@ export function App() {
     }
 
     if (!imageDataUrl) {
-      alert('Please draw an artwork for your coin on the canvas!');
+      alert('Please draw an artwork for your coin on the sketchpad!');
       return;
     }
 
@@ -49,7 +49,7 @@ export function App() {
 
     try {
       setLoading(true);
-      setStatusMessage('1/3 Uploading drawing & metadata to IPFS...');
+      setStatusMessage('1/3 Uploading your hand-drawn sketch to IPFS...');
 
       // Convert data URL to Blob for multipart upload
       const res = await fetch(imageDataUrl);
@@ -74,7 +74,7 @@ export function App() {
         throw new Error(ipfsData.details || ipfsData.error || 'Failed to upload image to IPFS');
       }
 
-      setStatusMessage('2/3 Preparing token launch transaction via PumpPortal...');
+      setStatusMessage('2/3 Generating PumpPortal bonding curve transaction...');
 
       // Create Launch Transaction
       const launchTxRes = await fetch('/api/create-launch-tx', {
@@ -98,7 +98,7 @@ export function App() {
         throw new Error(launchTxData.details || launchTxData.error || 'Failed to build transaction');
       }
 
-      setStatusMessage('3/3 Please approve the transaction in your Phantom wallet...');
+      setStatusMessage('3/3 Approve the launch transaction in Phantom wallet...');
 
       // Deserialize transaction for user signature
       const txBuffer = Buffer.from(launchTxData.transactionBase64, 'base64');
@@ -108,7 +108,7 @@ export function App() {
       const signedTransaction = await signTransaction(transaction);
       const signedTxBase64 = Buffer.from(signedTransaction.serialize()).toString('base64');
 
-      setStatusMessage('Broadcasting launch to Solana Mainnet...');
+      setStatusMessage('Broadcasting token launch to Solana Mainnet...');
 
       // Send signed transaction to server to broadcast to Solana
       const broadcastRes = await fetch('/api/broadcast-tx', {
@@ -124,10 +124,10 @@ export function App() {
         throw new Error(broadcastData.details || broadcastData.error || 'Transaction broadcast failed');
       }
 
-      // Trigger Celebration
+      // Trigger Celebration Confetti
       confetti({
-        particleCount: 120,
-        spread: 80,
+        particleCount: 140,
+        spread: 90,
         origin: { y: 0.6 },
       });
 
@@ -165,15 +165,15 @@ export function App() {
 
   return (
     <div style={styles.appContainer}>
-      {/* Navigation Header */}
-      <header style={styles.navbar}>
+      {/* Navigation Bar */}
+      <header style={styles.navbar} className="sketch-card">
         <div style={styles.logoGroup}>
           <div style={styles.logoIcon}>
-            <Palette size={24} color="#10b981" />
+            <span style={{ fontSize: '24px' }}>✏️</span>
           </div>
           <div>
             <div style={styles.brandTitle}>
-              Draw<span className="gradient-text">Pad</span>
+              Draw<span className="highlighter-tape-cyan">Pad</span>
             </div>
             <div style={styles.brandSubtitle}>Hand-drawn coins on pump.fun</div>
           </div>
@@ -188,29 +188,28 @@ export function App() {
         </div>
       </header>
 
-      {/* Hero Banner */}
+      {/* Hero Banner with Hand-Drawn Notebook Feel */}
       <section style={styles.heroSection}>
         <div style={styles.heroBadge}>
-          <Sparkles size={14} color="#f59e0b" />
-          <span>The First Draw-to-Launch Solana Memepad</span>
+          <span>⭐️ THE SKETCH-TO-LAUNCH MEMEPAD ⭐️</span>
         </div>
         <h1 style={styles.mainTitle}>
-          Draw It. Mint It. <span className="gradient-text">Pump It.</span>
+          Draw It. <span className="highlighter-tape">Mint It.</span> <span className="highlighter-tape-pink">Pump It.</span>
         </h1>
         <p style={styles.heroDescription}>
-          Create unique hand-drawn memecoins and launch them directly onto <strong>pump.fun</strong> via PumpPortal in seconds.
+          Doodle your coin on the paper, fill out the token info, and launch directly to <strong>pump.fun</strong> in seconds!
         </p>
       </section>
 
       {/* Main Studio Area */}
       <main style={styles.studioGrid}>
-        {/* Left: Canvas Studio */}
+        {/* Left: Hand-drawn Canvas Studio */}
         <DrawingCanvas 
           onImageExport={(dataUrl) => setImageDataUrl(dataUrl)} 
           previewUrl={imageDataUrl}
         />
 
-        {/* Right: Token Details & Launchpad */}
+        {/* Right: Token Details & Launch Form */}
         <TokenForm
           formData={formData}
           onChange={handleFormChange}
@@ -221,22 +220,22 @@ export function App() {
         />
       </main>
 
-      {/* Feature Highlights Footer */}
+      {/* Sketchy Feature Cards */}
       <footer style={styles.featuresFooter}>
-        <div style={styles.featureCard} className="glass-panel">
-          <Zap size={22} color="#10b981" />
-          <h4>Instant Bonding Curve</h4>
-          <p>Launches directly into pump.fun liquidity pool via PumpPortal.</p>
+        <div style={styles.featureCard} className="sketch-card">
+          <div style={{ fontSize: '24px' }}>⚡️</div>
+          <h4 style={styles.featureTitle}>Instant Bonding Curve</h4>
+          <p style={styles.featureText}>Directly creates pump.fun token pool via PumpPortal API.</p>
         </div>
-        <div style={styles.featureCard} className="glass-panel">
-          <Palette size={22} color="#06b6d4" />
-          <h4>100% On-Chain Artwork</h4>
-          <p>Export your hand-drawn canvas directly to IPFS metadata.</p>
+        <div style={styles.featureCard} className="sketch-card">
+          <div style={{ fontSize: '24px' }}>🎨</div>
+          <h4 style={styles.featureTitle}>100% Hand-Drawn Art</h4>
+          <p style={styles.featureText}>Your drawing is uploaded directly to decentralized IPFS metadata.</p>
         </div>
-        <div style={styles.featureCard} className="glass-panel">
-          <ShieldCheck size={22} color="#8b5cf6" />
-          <h4>Phantom Non-Custodial</h4>
-          <p>You sign directly with your Solana wallet. Safe and secure.</p>
+        <div style={styles.featureCard} className="sketch-card">
+          <div style={{ fontSize: '24px' }}>🔒</div>
+          <h4 style={styles.featureTitle}>Phantom Non-Custodial</h4>
+          <p style={styles.featureText}>You sign every launch transaction securely with your wallet.</p>
         </div>
       </footer>
 
@@ -254,105 +253,104 @@ export function App() {
 
 const styles = {
   appContainer: {
-    maxWidth: '1240px',
+    maxWidth: '1200px',
     margin: '0 auto',
-    padding: '24px 20px 60px 20px',
+    padding: '24px 16px 60px 16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '36px',
+    gap: '28px',
     width: '100%',
   },
   navbar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '16px 24px',
-    background: 'rgba(15, 23, 42, 0.65)',
-    backdropFilter: 'blur(16px)',
-    borderRadius: '16px',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    padding: '12px 20px',
+    backgroundColor: '#ffffff',
   },
   logoGroup: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '10px',
   },
   logoIcon: {
-    background: 'rgba(16, 185, 129, 0.12)',
-    padding: '10px',
-    borderRadius: '12px',
+    background: '#fef08a',
+    border: '2px solid #1a1a1e',
+    borderRadius: '10px',
+    padding: '4px 8px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    boxShadow: '1.5px 1.5px 0px #1a1a1e',
   },
   brandTitle: {
-    fontSize: '22px',
-    fontWeight: '900',
-    letterSpacing: '-0.03em',
-    color: '#f8fafc',
+    fontSize: '26px',
+    fontWeight: '800',
+    color: '#1a1a1e',
+    fontFamily: 'var(--font-heading)',
+    lineHeight: '1.1',
   },
   brandSubtitle: {
-    fontSize: '11px',
-    color: '#94a3b8',
-    fontWeight: '500',
+    fontSize: '14px',
+    color: '#64748b',
+    fontWeight: '600',
   },
   navActions: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: '12px',
+    flexWrap: 'wrap',
   },
   networkBadge: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '20px',
-    padding: '6px 12px',
-    fontSize: '12px',
-    fontWeight: '600',
-    color: '#cbd5e1',
+    gap: '6px',
+    background: '#f8fafc',
+    border: '2px solid #1a1a1e',
+    borderRadius: '10px',
+    padding: '4px 10px',
+    fontSize: '14px',
+    fontWeight: '700',
+    color: '#1a1a1e',
+    boxShadow: '1.5px 1.5px 0px #1a1a1e',
   },
   activeDot: {
     width: '8px',
     height: '8px',
     borderRadius: '50%',
-    backgroundColor: '#10b981',
-    boxShadow: '0 0 8px #10b981',
+    backgroundColor: '#16a34a',
+    boxShadow: '0 0 4px #16a34a',
   },
   heroSection: {
     textAlign: 'center',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '12px',
-    margin: '10px 0',
+    gap: '10px',
+    margin: '6px 0',
   },
   heroBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    background: 'rgba(245, 158, 11, 0.1)',
-    border: '1px solid rgba(245, 158, 11, 0.3)',
-    color: '#fbbf24',
+    background: '#fed7aa',
+    border: '2px dashed #1a1a1e',
+    color: '#1a1a1e',
     borderRadius: '20px',
-    padding: '4px 14px',
-    fontSize: '12px',
+    padding: '4px 16px',
+    fontSize: '13px',
     fontWeight: '700',
-    textTransform: 'uppercase',
+    fontFamily: 'var(--font-mono)',
   },
   mainTitle: {
-    fontSize: '44px',
-    fontWeight: '900',
-    letterSpacing: '-0.04em',
-    color: '#f8fafc',
-    lineHeight: '1.15',
+    fontSize: '46px',
+    fontWeight: '800',
+    color: '#1a1a1e',
+    fontFamily: 'var(--font-heading)',
+    lineHeight: '1.2',
   },
   heroDescription: {
-    fontSize: '16px',
-    color: '#94a3b8',
-    maxWidth: '580px',
-    lineHeight: '1.5',
+    fontSize: '20px',
+    color: '#475569',
+    maxWidth: '620px',
+    lineHeight: '1.4',
   },
   studioGrid: {
     display: 'flex',
@@ -364,16 +362,28 @@ const styles = {
   },
   featuresFooter: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
     gap: '16px',
-    marginTop: '20px',
+    marginTop: '16px',
   },
   featureCard: {
-    padding: '20px',
+    padding: '18px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: '6px',
     textAlign: 'left',
+    backgroundColor: '#ffffff',
+  },
+  featureTitle: {
+    fontSize: '18px',
+    fontWeight: '700',
+    color: '#1a1a1e',
+    fontFamily: 'var(--font-heading)',
+  },
+  featureText: {
+    fontSize: '15px',
+    color: '#64748b',
+    lineHeight: '1.4',
   }
 };
 
