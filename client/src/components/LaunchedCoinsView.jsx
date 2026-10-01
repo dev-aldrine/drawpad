@@ -3,19 +3,19 @@ import { motion } from 'framer-motion';
 import { Rocket, Sparkles, RefreshCw, Pen, ExternalLink, Lock } from '@sketchyicons/react';
 import TiltedCard from './TiltedCard';
 
-import pepeImg from '../../draw/pepe.jpeg';
+import spodermanImg from '../../draw/spoderman.jpeg';
 import dogeImg from '../../draw/doge.jpeg';
 import dogwiphapImg from '../../draw/dogwiphap.jpeg';
 
 // Built-in initial sample doodle coins using real drawings from /draw
 const DEFAULT_COMMUNITY_COINS = [
   {
-    name: 'Pepe the Frog',
-    symbol: 'PEPE',
-    description: 'The iconic hand-drawn green frog meme created and sketched for Solana.',
+    name: 'Spoderman',
+    symbol: 'SPODERMAN',
+    description: 'Pls spoderman no. The classic iconic hand-drawn meme coin on Solana.',
     mintPublicKey: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
     signature: '5K2bN5sC8F8j3bV9X8Z1Q7M4N2B9V6X3C8Z1Q7M4N2B9V6X3C8Z1Q7M4N2B9V6X3',
-    imageUrl: pepeImg,
+    imageUrl: spodermanImg,
     createdAt: new Date(Date.now() - 3600000 * 3).toISOString(),
     initialBuySol: 0.5,
     creator: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
