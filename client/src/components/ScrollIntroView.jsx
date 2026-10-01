@@ -1,44 +1,131 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Pen, Coins, Rocket, Check, ChevronDown, ArrowDown } from '@sketchyicons/react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Pen, Coins, Rocket, Check, ArrowDown, ArrowUp, ChevronDown, Sparkles } from '@sketchyicons/react';
 import RotatingText from './RotatingText';
 
 export const ScrollIntroView = ({ onLaunchNow }) => {
-  const containerRef = useRef(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const isTransitioningRef = useRef(false);
+  const touchStartYRef = useRef(0);
 
-  // Track scroll through the pinned sticky section (300vh track for 3 steps)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end']
-  });
+  const totalSlides = 5;
 
-  // Calculate active step ranges with cleaner transitions
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.22, 0.33], [1, 1, 0]);
-  const step1Scale = useTransform(scrollYProgress, [0, 0.22, 0.33], [1, 1, 0.92]);
-  const step1Y = useTransform(scrollYProgress, [0, 0.22, 0.33], [0, 0, -30]);
-  const step1RotateX = useTransform(scrollYProgress, [0, 0.22, 0.33], [0, 0, -15]);
+  const goToSlide = (index) => {
+    if (index >= 0 && index < totalSlides) {
+      setActiveSlide(index);
+    }
+  };
 
-  const step2Opacity = useTransform(scrollYProgress, [0.30, 0.38, 0.58, 0.66], [0, 1, 1, 0]);
-  const step2Scale = useTransform(scrollYProgress, [0.30, 0.38, 0.58, 0.66], [0.92, 1, 1, 0.92]);
-  const step2Y = useTransform(scrollYProgress, [0.30, 0.38, 0.58, 0.66], [30, 0, 0, -30]);
-  const step2RotateX = useTransform(scrollYProgress, [0.30, 0.38, 0.58, 0.66], [15, 0, 0, -15]);
+  const nextSlide = () => {
+    if (activeSlide < totalSlides - 1) {
+      goToSlide(activeSlide + 1);
+    }
+  };
 
-  const step3Opacity = useTransform(scrollYProgress, [0.63, 0.72, 1], [0, 1, 1]);
-  const step3Scale = useTransform(scrollYProgress, [0.63, 0.72, 1], [0.92, 1, 1]);
-  const step3Y = useTransform(scrollYProgress, [0.63, 0.72, 1], [30, 0, 0]);
-  const step3RotateX = useTransform(scrollYProgress, [0.63, 0.72, 1], [15, 0, 0]);
+  const prevSlide = () => {
+    if (activeSlide > 0) {
+      goToSlide(activeSlide - 1);
+    }
+  };
 
-  // Track progress bar percentage
-  const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  // Wheel listener with debounce
+  useEffect(() => {
+    const handleWheel = (e) => {
+      // Prevent rapid fire transitions
+      if (isTransitioningRef.current) return;
+
+      if (Math.abs(e.deltaY) > 25) {
+        isTransitioningRef.current = true;
+        if (e.deltaY > 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+        setTimeout(() => {
+          isTransitioningRef.current = false;
+        }, 650);
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        prevSlide();
+      }
+    };
+
+    const handleTouchStart = (e) => {
+      touchStartYRef.current = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e) => {
+      if (isTransitioningRef.current) return;
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffY = touchStartYRef.current - touchEndY;
+
+      if (Math.abs(diffY) > 40) {
+        isTransitioningRef.current = true;
+        if (diffY > 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+        setTimeout(() => {
+          isTransitioningRef.current = false;
+        }, 650);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [activeSlide]);
+
+  const slideVariants = {
+    enter: (direction) => ({
+      y: direction > 0 ? 80 : -80,
+      opacity: 0,
+      scale: 0.94,
+      rotateX: direction > 0 ? 12 : -12,
+    }),
+    center: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      rotateX: 0,
+      transition: {
+        duration: 0.45,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+    exit: (direction) => ({
+      y: direction > 0 ? -80 : 80,
+      opacity: 0,
+      scale: 0.94,
+      rotateX: direction > 0 ? -12 : 12,
+      transition: {
+        duration: 0.35,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    }),
+  };
 
   const steps = [
     {
       num: '01',
       title: 'Doodle your Masterpiece',
-      subtitle: 'Hand-drawn On-Chain Art',
+      subtitle: 'Step 1 • Canvas Studio',
       desc: 'Use the interactive sketchbook canvas to draw your coin logo. Choose pencil sizes, marker colors, erasers, and sketch stamps. No boring AI images—100% authentic community creativity.',
       highlights: ['Custom stroke widths & colors', 'Undo & clear history stack', 'PNG export with decentralized IPFS metadata'],
-      badge: 'Step 1 • Canvas Studio',
       color: 'var(--marker-yellow)',
       tapeColor: '#fef08a',
       icon: <Pen size={32} />
@@ -46,10 +133,9 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
     {
       num: '02',
       title: 'Configure Token Details',
-      subtitle: 'Fair & Flexible Tokenomics',
+      subtitle: 'Step 2 • Launch Specs',
       desc: 'Give your hand-drawn coin a memorable Name, Ticker ($SYMBOL), and fun meme lore or description. You can also customize initial dev buy amount in SOL and slippage percentage.',
       highlights: ['Custom Coin Name & Ticker', 'Optional initial dev buy on bonding curve', 'Social links (Twitter/X, Telegram, Website)'],
-      badge: 'Step 2 • Launch Specs',
       color: 'var(--marker-green)',
       tapeColor: '#bbf7d0',
       icon: <Coins size={32} />
@@ -57,10 +143,9 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
     {
       num: '03',
       title: 'Deploy to pump.fun via PumpPortal',
-      subtitle: 'Instant Non-Custodial Bonding Curve',
+      subtitle: 'Step 3 • Live Launch',
       desc: 'Connect your Phantom or Solflare Solana wallet. Approve the non-custodial transaction. The bonding curve is created immediately on pump.fun and your coin is instantly tradable.',
       highlights: ['100% Non-custodial signing with Phantom', 'Direct pump.fun bonding curve integration', 'Live Solscan tx signature & instant trading link'],
-      badge: 'Step 3 • Live Launch',
       color: 'var(--marker-cyan)',
       tapeColor: '#bae6fd',
       icon: <Rocket size={32} />
@@ -79,84 +164,113 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
     {
       q: 'Is DrawPad non-custodial?',
       a: 'Yes! DrawPad never holds your private keys or funds. Every launch transaction is signed directly and securely inside your Phantom or Solflare wallet.'
-    },
-    {
-      q: 'Can I download my drawing as a PNG?',
-      a: 'Absolutely. The studio canvas includes a Save PNG button so you can keep and share high-resolution copies of your hand-drawn artwork.'
     }
   ];
 
   return (
-    <div style={styles.container}>
-      {/* Intro Hero with RotatingText */}
-      <motion.section 
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6 }}
-        style={styles.introHero} 
-        className="sketch-card"
-      >
-        <div style={styles.tapeTop}>
-          <span>DRAWPAD • HOW IT WORKS</span>
-        </div>
+    <div style={styles.deckWrapper}>
+      {/* Slide Navigation Pagination Dots */}
+      <div style={styles.paginationSidebar}>
+        {[0, 1, 2, 3, 4].map((idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => goToSlide(idx)}
+            style={{
+              ...styles.dotBtn,
+              background: activeSlide === idx ? 'var(--ink-black)' : '#e2e8f0',
+              transform: activeSlide === idx ? 'scale(1.3)' : 'scale(1)',
+              borderColor: activeSlide === idx ? '#1a1a1e' : '#94a3b8',
+            }}
+            title={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
 
-        <div style={styles.heroBadgeWrap}>
-          <span style={styles.sparkleDot}>✦</span>
-          <span style={styles.heroBadgeText}>The Sketch-to-Launch Solana Protocol</span>
-          <span style={styles.sparkleDot}>✦</span>
-        </div>
-
-        <h1 style={styles.mainTitle}>
-          Draw it.{' '}
-          <span className="highlighter-tape-cyan" style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
-            <RotatingText
-              texts={['Launch it.', 'Pump it.', 'Trade it.', 'Meme it.']}
-              mainClassName="justify-center"
-              staggerFrom="last"
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '-120%', opacity: 0 }}
-              staggerDuration={0.03}
-              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-              rotationInterval={2400}
-            />
-          </span>
-        </h1>
-        <p style={styles.heroDesc}>
-          Turn rough sketches into live Solana tokens on <strong>pump.fun</strong>. Scroll down to step through each phase 1 by 1.
-        </p>
-
-        <div style={styles.scrollDownIndicator}>
-          <span>Scroll down to step through</span>
-          <motion.div animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-            <ArrowDown size={18} />
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* PINNED STICKY 1-BY-1 SCROLL TRACK (300vh height track) */}
-      <div ref={containerRef} style={styles.stickyTrackWrapper}>
-        <div style={styles.stickyWindow}>
-          {/* Progress Tracker Bar */}
-          <div style={styles.progressBarTrack}>
-            <motion.div style={{ ...styles.progressBarFill, width: progressBarWidth }} />
-          </div>
-
-          <div style={styles.stepPresenter}>
-            {/* STEP 1 CARD */}
-            <motion.div 
-              style={{
-                ...styles.stepCardAbsolute,
-                opacity: step1Opacity,
-                scale: step1Scale,
-                y: step1Y,
-                rotateX: step1RotateX,
-                pointerEvents: 'auto'
-              }}
+      {/* Main Single-Screen Slide Container */}
+      <div style={styles.slideDisplayBox}>
+        <AnimatePresence mode="wait" custom={1}>
+          {/* SLIDE 0: HERO INTRO */}
+          {activeSlide === 0 && (
+            <motion.div
+              key="slide-0"
+              custom={1}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              style={styles.cardContainer}
             >
-              <div style={styles.stepCard} className="sketch-card">
-                <div style={{ ...styles.cardTape, background: steps[0].tapeColor }}>
-                  <span>{steps[0].badge}</span>
+              <div style={styles.slideCard} className="sketch-card">
+                <div style={styles.tapeTop}>
+                  <span>DRAWPAD • HOW IT WORKS</span>
+                </div>
+
+                <div style={styles.heroBadgeWrap}>
+                  <span style={styles.sparkleDot}>✦</span>
+                  <span style={styles.heroBadgeText}>The Sketch-to-Launch Solana Protocol</span>
+                  <span style={styles.sparkleDot}>✦</span>
+                </div>
+
+                <h1 style={styles.mainTitle}>
+                  Draw it.{' '}
+                  <span className="highlighter-tape-cyan" style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
+                    <RotatingText
+                      texts={['Launch it.', 'Pump it.', 'Trade it.', 'Meme it.']}
+                      mainClassName="justify-center"
+                      staggerFrom="last"
+                      initial={{ y: '100%', opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: '-120%', opacity: 0 }}
+                      staggerDuration={0.03}
+                      transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                      rotationInterval={2400}
+                    />
+                  </span>
+                </h1>
+
+                <p style={styles.heroDesc}>
+                  Turn rough sketches into live Solana tokens on <strong>pump.fun</strong>. Hand-drawn art meets instant bonding curves.
+                </p>
+
+                <div style={styles.slideActionsRow}>
+                  <button
+                    type="button"
+                    onClick={nextSlide}
+                    className="sketch-btn sketch-btn-green"
+                    style={styles.actionBtn}
+                  >
+                    <span>Explore Steps (Scroll Down)</span>
+                    <ArrowDown size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onLaunchNow}
+                    className="sketch-btn"
+                    style={{ ...styles.actionBtn, background: 'var(--marker-cyan)' }}
+                  >
+                    <Rocket size={18} />
+                    <span>Skip to Studio</span>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* SLIDE 1: STEP 1 */}
+          {activeSlide === 1 && (
+            <motion.div
+              key="slide-1"
+              custom={1}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              style={styles.cardContainer}
+            >
+              <div style={styles.slideCard} className="sketch-card">
+                <div style={{ ...styles.tapeTop, background: steps[0].tapeColor }}>
+                  <span>{steps[0].subtitle}</span>
                 </div>
 
                 <div style={styles.cardHeader}>
@@ -165,7 +279,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                   </div>
                   <div>
                     <h2 style={styles.cardTitle}>{steps[0].title}</h2>
-                    <span style={styles.cardSubtitle}>{steps[0].subtitle}</span>
+                    <span style={styles.cardStepNum}>Phase 01 of 03</span>
                   </div>
                 </div>
 
@@ -179,23 +293,33 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                     </div>
                   ))}
                 </div>
+
+                <div style={styles.navigationControls}>
+                  <button type="button" onClick={prevSlide} className="sketch-btn" style={styles.miniBtn}>
+                    <ArrowUp size={16} /> Back
+                  </button>
+                  <button type="button" onClick={nextSlide} className="sketch-btn sketch-btn-green" style={styles.miniBtn}>
+                    Next: Token Setup <ArrowDown size={16} />
+                  </button>
+                </div>
               </div>
             </motion.div>
+          )}
 
-            {/* STEP 2 CARD */}
-            <motion.div 
-              style={{
-                ...styles.stepCardAbsolute,
-                opacity: step2Opacity,
-                scale: step2Scale,
-                y: step2Y,
-                rotateX: step2RotateX,
-                pointerEvents: 'auto'
-              }}
+          {/* SLIDE 2: STEP 2 */}
+          {activeSlide === 2 && (
+            <motion.div
+              key="slide-2"
+              custom={1}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              style={styles.cardContainer}
             >
-              <div style={styles.stepCard} className="sketch-card">
-                <div style={{ ...styles.cardTape, background: steps[1].tapeColor }}>
-                  <span>{steps[1].badge}</span>
+              <div style={styles.slideCard} className="sketch-card">
+                <div style={{ ...styles.tapeTop, background: steps[1].tapeColor }}>
+                  <span>{steps[1].subtitle}</span>
                 </div>
 
                 <div style={styles.cardHeader}>
@@ -204,7 +328,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                   </div>
                   <div>
                     <h2 style={styles.cardTitle}>{steps[1].title}</h2>
-                    <span style={styles.cardSubtitle}>{steps[1].subtitle}</span>
+                    <span style={styles.cardStepNum}>Phase 02 of 03</span>
                   </div>
                 </div>
 
@@ -218,23 +342,33 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                     </div>
                   ))}
                 </div>
+
+                <div style={styles.navigationControls}>
+                  <button type="button" onClick={prevSlide} className="sketch-btn" style={styles.miniBtn}>
+                    <ArrowUp size={16} /> Back
+                  </button>
+                  <button type="button" onClick={nextSlide} className="sketch-btn sketch-btn-green" style={styles.miniBtn}>
+                    Next: Live Deploy <ArrowDown size={16} />
+                  </button>
+                </div>
               </div>
             </motion.div>
+          )}
 
-            {/* STEP 3 CARD */}
-            <motion.div 
-              style={{
-                ...styles.stepCardAbsolute,
-                opacity: step3Opacity,
-                scale: step3Scale,
-                y: step3Y,
-                rotateX: step3RotateX,
-                pointerEvents: 'auto'
-              }}
+          {/* SLIDE 3: STEP 3 */}
+          {activeSlide === 3 && (
+            <motion.div
+              key="slide-3"
+              custom={1}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              style={styles.cardContainer}
             >
-              <div style={styles.stepCard} className="sketch-card">
-                <div style={{ ...styles.cardTape, background: steps[2].tapeColor }}>
-                  <span>{steps[2].badge}</span>
+              <div style={styles.slideCard} className="sketch-card">
+                <div style={{ ...styles.tapeTop, background: steps[2].tapeColor }}>
+                  <span>{steps[2].subtitle}</span>
                 </div>
 
                 <div style={styles.cardHeader}>
@@ -243,7 +377,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                   </div>
                   <div>
                     <h2 style={styles.cardTitle}>{steps[2].title}</h2>
-                    <span style={styles.cardSubtitle}>{steps[2].subtitle}</span>
+                    <span style={styles.cardStepNum}>Phase 03 of 03</span>
                   </div>
                 </div>
 
@@ -257,86 +391,134 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                     </div>
                   ))}
                 </div>
+
+                <div style={styles.navigationControls}>
+                  <button type="button" onClick={prevSlide} className="sketch-btn" style={styles.miniBtn}>
+                    <ArrowUp size={16} /> Back
+                  </button>
+                  <button type="button" onClick={nextSlide} className="sketch-btn sketch-btn-green" style={styles.miniBtn}>
+                    Got Questions? <ArrowDown size={16} />
+                  </button>
+                </div>
               </div>
             </motion.div>
-          </div>
-        </div>
+          )}
+
+          {/* SLIDE 4: FAQS & READY TO LAUNCH */}
+          {activeSlide === 4 && (
+            <motion.div
+              key="slide-4"
+              custom={1}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              style={styles.cardContainer}
+            >
+              <div style={styles.slideCard} className="sketch-card">
+                <div style={{ ...styles.tapeTop, background: '#fed7aa' }}>
+                  <span>GOT QUESTIONS? • FAQ & LAUNCH</span>
+                </div>
+
+                <h2 style={{ ...styles.cardTitle, textAlign: 'center', marginTop: '4px' }}>
+                  Ready to launch your hand-drawn coin?
+                </h2>
+
+                <div style={styles.faqListCompact}>
+                  {faqs.map((faq, idx) => (
+                    <div key={idx} style={styles.faqItemCompact}>
+                      <div style={styles.faqQ}>
+                        <Sparkles size={16} style={{ color: '#ca8a04', flexShrink: 0 }} />
+                        <span>{faq.q}</span>
+                      </div>
+                      <div style={styles.faqA}>{faq.a}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={styles.ctaBottomRow}>
+                  <button type="button" onClick={prevSlide} className="sketch-btn" style={styles.miniBtn}>
+                    <ArrowUp size={16} /> Back
+                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    type="button"
+                    onClick={onLaunchNow}
+                    className="sketch-btn sketch-btn-green"
+                    style={styles.bigLaunchBtn}
+                  >
+                    <Rocket size={22} />
+                    <span>Open Drawing Studio</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Interactive FAQ Accordion Section */}
-      <motion.section 
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        style={styles.faqSection} 
-        className="sketch-card"
-      >
-        <div style={styles.tapeFaq}>
-          <span>FREQUENTLY ASKED QUESTIONS</span>
-        </div>
-
-        <h2 style={styles.faqHeading}>Got Questions?</h2>
-        <div style={styles.faqList}>
-          {faqs.map((faq, idx) => (
-            <details key={idx} style={styles.faqDetails}>
-              <summary style={styles.faqSummary}>
-                <span>{faq.q}</span>
-                <ChevronDown size={18} />
-              </summary>
-              <p style={styles.faqAnswer}>{faq.a}</p>
-            </details>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* Bottom Launch Call To Action */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        style={styles.bottomCtaWrap} 
-        className="sketch-card"
-      >
-        <div style={styles.bottomCtaInner}>
-          <h2 style={styles.bottomCtaTitle}>Ready to launch your hand-drawn coin?</h2>
-          <p style={styles.bottomCtaDesc}>Pick up your digital pencil and deploy to pump.fun in under 2 minutes.</p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            type="button"
-            onClick={onLaunchNow}
-            className="sketch-btn sketch-btn-green"
-            style={styles.bigLaunchBtn}
-          >
-            <Rocket size={22} />
-            <span>Open Drawing Studio</span>
-          </motion.button>
-        </div>
-      </motion.div>
+      {/* Slide Navigation Hint Footer */}
+      <div style={styles.bottomHint}>
+        <span>Slide {activeSlide + 1} of {totalSlides} • Scroll or use arrow keys / dots to navigate</span>
+      </div>
     </div>
   );
 };
 
 const styles = {
-  container: {
+  deckWrapper: {
     width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '42px',
-    maxWidth: '860px',
+    maxWidth: '820px',
     margin: '0 auto',
-  },
-  introHero: {
-    padding: '40px 32px 34px 32px',
-    textAlign: 'center',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '12px',
+    justifyContent: 'center',
     position: 'relative',
+    minHeight: 'calc(100vh - 160px)',
+  },
+  paginationSidebar: {
+    position: 'absolute',
+    right: '-36px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    zIndex: 10,
+  },
+  dotBtn: {
+    width: '12px',
+    height: '12px',
+    borderRadius: '50%',
+    border: '2px solid',
+    cursor: 'pointer',
+    padding: 0,
+    transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    boxShadow: '1px 1px 0px rgba(0,0,0,0.2)',
+  },
+  slideDisplayBox: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    perspective: '1200px',
+    minHeight: '480px',
+  },
+  cardContainer: {
+    width: '100%',
+    transformStyle: 'preserve-3d',
+  },
+  slideCard: {
+    padding: '36px 30px 28px 30px',
     backgroundColor: '#ffffff',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    boxShadow: '4px 4px 0px #1a1a1e',
+    borderRadius: '16px',
   },
   tapeTop: {
     position: 'absolute',
@@ -353,7 +535,8 @@ const styles = {
     color: '#1a1a1e',
   },
   heroBadgeWrap: {
-    display: 'flex',
+    display: 'inline-flex',
+    alignSelf: 'center',
     alignItems: 'center',
     gap: '8px',
     background: '#fef9c3',
@@ -361,6 +544,7 @@ const styles = {
     borderRadius: '16px',
     padding: '3px 14px',
     boxShadow: '1px 1px 0px #1a1a1e',
+    marginTop: '4px',
   },
   sparkleDot: {
     color: '#ca8a04',
@@ -372,96 +556,31 @@ const styles = {
     color: '#1a1a1e',
   },
   mainTitle: {
-    fontSize: '44px',
+    fontSize: '42px',
     fontWeight: '800',
     color: '#1a1a1e',
     fontFamily: 'var(--font-heading)',
     lineHeight: '1.2',
+    textAlign: 'center',
   },
   heroDesc: {
     fontSize: '19px',
     color: '#475569',
+    textAlign: 'center',
     maxWidth: '620px',
+    margin: '0 auto',
     lineHeight: '1.45',
   },
-  scrollDownIndicator: {
+  slideActionsRow: {
     display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '15px',
-    fontWeight: '700',
-    color: '#1a1a1e',
-    background: '#f8fafc',
-    border: '1.5px solid #1a1a1e',
-    borderRadius: '20px',
-    padding: '6px 16px',
-    marginTop: '6px',
-  },
-  /* 300vh sticky scroll presenter */
-  stickyTrackWrapper: {
-    position: 'relative',
-    height: '240vh',
-    width: '100%',
-  },
-  stickyWindow: {
-    position: 'sticky',
-    top: '120px',
-    height: '520px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
     justifyContent: 'center',
-    perspective: '1200px',
+    gap: '14px',
+    marginTop: '12px',
+    flexWrap: 'wrap',
   },
-  progressBarTrack: {
-    width: '260px',
-    height: '8px',
-    background: '#e2e8f0',
-    border: '1.5px solid #1a1a1e',
-    borderRadius: '6px',
-    marginBottom: '20px',
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    background: '#10b981',
-    borderRadius: '4px',
-  },
-  stepPresenter: {
-    position: 'relative',
-    width: '100%',
-    maxWidth: '720px',
-    height: '420px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepCardAbsolute: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    transformStyle: 'preserve-3d',
-  },
-  stepCard: {
-    padding: '34px 28px',
-    backgroundColor: '#ffffff',
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    boxShadow: '4px 4px 0px #1a1a1e',
-  },
-  cardTape: {
-    position: 'absolute',
-    top: '-12px',
-    left: '24px',
-    border: '1.5px dashed #1a1a1e',
-    padding: '3px 14px',
-    fontFamily: 'var(--font-mono)',
-    fontSize: '12px',
-    fontWeight: '700',
-    color: '#1a1a1e',
+  actionBtn: {
+    padding: '12px 24px',
+    fontSize: '18px',
   },
   cardHeader: {
     display: 'flex',
@@ -487,8 +606,8 @@ const styles = {
     fontFamily: 'var(--font-heading)',
     lineHeight: '1.2',
   },
-  cardSubtitle: {
-    fontSize: '15px',
+  cardStepNum: {
+    fontSize: '14px',
     fontWeight: '700',
     color: '#64748b',
     fontFamily: 'var(--font-mono)',
@@ -529,91 +648,63 @@ const styles = {
     fontWeight: '600',
     color: '#1e293b',
   },
-  faqSection: {
-    padding: '32px 26px',
-    backgroundColor: '#ffffff',
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '18px',
-    marginTop: '20px',
-  },
-  tapeFaq: {
-    position: 'absolute',
-    top: '-14px',
-    left: '50%',
-    transform: 'translateX(-50%) rotate(0.5deg)',
-    background: '#fed7aa',
-    border: '2px dashed #1a1a1e',
-    padding: '2px 16px',
-    fontFamily: 'var(--font-mono)',
-    fontSize: '11px',
-    fontWeight: '700',
-    color: '#1a1a1e',
-  },
-  faqHeading: {
-    fontSize: '28px',
-    fontWeight: '800',
-    color: '#1a1a1e',
-    fontFamily: 'var(--font-heading)',
-    textAlign: 'center',
-  },
-  faqList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  faqDetails: {
-    background: '#f8fafc',
-    border: '2px solid #1a1a1e',
-    borderRadius: '10px',
-    padding: '14px 18px',
-    boxShadow: '1.5px 1.5px 0px #1a1a1e',
-    cursor: 'pointer',
-  },
-  faqSummary: {
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#1a1a1e',
-    fontFamily: 'var(--font-heading)',
+  navigationControls: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    listStyle: 'none',
+    marginTop: '8px',
   },
-  faqAnswer: {
+  miniBtn: {
+    padding: '8px 18px',
     fontSize: '16px',
-    color: '#475569',
-    marginTop: '10px',
-    lineHeight: '1.45',
-    borderTop: '1.5px dashed #cbd5e1',
-    paddingTop: '8px',
   },
-  bottomCtaWrap: {
-    padding: '32px 24px',
-    backgroundColor: '#fef08a',
-    textAlign: 'center',
-    border: '2.5px solid #1a1a1e',
-  },
-  bottomCtaInner: {
+  faqListCompact: {
     display: 'flex',
     flexDirection: 'column',
+    gap: '10px',
+  },
+  faqItemCompact: {
+    background: '#f8fafc',
+    border: '1.5px solid #1a1a1e',
+    borderRadius: '10px',
+    padding: '12px 16px',
+    boxShadow: '1.5px 1.5px 0px #1a1a1e',
+  },
+  faqQ: {
+    display: 'flex',
     alignItems: 'center',
+    gap: '8px',
+    fontWeight: '700',
+    fontSize: '17px',
+    fontFamily: 'var(--font-heading)',
+    color: '#1a1a1e',
+  },
+  faqA: {
+    fontSize: '15px',
+    color: '#475569',
+    marginTop: '4px',
+    paddingLeft: '24px',
+    lineHeight: '1.4',
+  },
+  ctaBottomRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '10px',
+    flexWrap: 'wrap',
     gap: '12px',
   },
-  bottomCtaTitle: {
-    fontSize: '32px',
-    fontWeight: '800',
-    color: '#1a1a1e',
-    fontFamily: 'var(--font-heading)',
-  },
-  bottomCtaDesc: {
-    fontSize: '18px',
-    color: '#475569',
-  },
   bigLaunchBtn: {
-    padding: '16px 36px',
-    fontSize: '22px',
-    marginTop: '6px',
-  }
+    padding: '12px 28px',
+    fontSize: '19px',
+  },
+  bottomHint: {
+    marginTop: '16px',
+    fontSize: '14px',
+    color: '#64748b',
+    fontWeight: '600',
+    fontFamily: 'var(--font-mono)',
+    textAlign: 'center',
+  },
 };
+
