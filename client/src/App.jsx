@@ -202,7 +202,7 @@ export function App() {
             variance={0.45}
             parallax={0.6}
             lift={140}
-            fade={0.6}
+            fade={0.15}
             dim={1}
             overlayColor="#060010"
             roll={2}

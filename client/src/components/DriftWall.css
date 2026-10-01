@@ -3,23 +3,23 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  perspective: var(--dw-perspective, 1200px);
+  perspective: var(--dw-perspective, 2400px);
   perspective-origin: 50% 50%;
-  --dw-tile-w: 200px;
-  --dw-tile-h: 132px;
-  --dw-gap: 18px;
+  --dw-tile-w: 220px;
+  --dw-tile-h: 220px;
+  --dw-gap: 48px;
   --dw-radius: 14px;
-  --dw-lift: 64px;
-  --dw-dim: 0.55;
+  --dw-lift: 140px;
+  --dw-dim: 1;
   --dw-gray: 0;
-  --dw-overlay: #fbf6ea;
-  --dw-edge: 40%;
+  --dw-overlay: #060010;
+  --dw-edge: 85%;
   -webkit-mask-image:
-    radial-gradient(ellipse 82% 86% at 50% 50%, #000 var(--dw-edge), transparent 100%),
+    radial-gradient(ellipse 110% 120% at 50% 50%, #000 var(--dw-edge), transparent 100%),
     linear-gradient(to top, #000 var(--dw-edge), transparent 100%);
   -webkit-mask-composite: source-in;
   mask-image:
-    radial-gradient(ellipse 82% 86% at 50% 50%, #000 var(--dw-edge), transparent 100%),
+    radial-gradient(ellipse 110% 120% at 50% 50%, #000 var(--dw-edge), transparent 100%),
     linear-gradient(to top, #000 var(--dw-edge), transparent 100%);
   mask-composite: intersect;
 }
