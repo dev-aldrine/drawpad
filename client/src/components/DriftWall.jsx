@@ -75,7 +75,10 @@ const DriftWall = ({
   const pointerDampedRef = useRef({ x: 0, y: 0 });
   const lastTsRef = useRef(null);
 
-  const [containerHeight, setContainerHeight] = useState(600);
+  const [dimensions, setDimensions] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1920,
+    height: typeof window !== 'undefined' ? window.innerHeight : 1080
+  });
   const [activeId, setActiveId] = useState(null);
   const activeIdRef = useRef(null);
   const [reduced, setReduced] = useState(false);
@@ -88,36 +91,61 @@ const DriftWall = ({
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
+  useLayoutEffect(() => {
+    if (!containerRef.current) return;
+    const updateSize = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setDimensions({
+          width: rect.width || window.innerWidth || 1920,
+          height: rect.height || window.innerHeight || 1080
+        });
+      }
+    };
+    updateSize();
+    const ro = new ResizeObserver(([entry]) => {
+      if (entry) {
+        setDimensions({
+          width: entry.contentRect.width || window.innerWidth || 1920,
+          height: entry.contentRect.height || window.innerHeight || 1080
+        });
+      }
+    });
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  // Dynamically calculate the number of columns required to fully bleed off-screen in 3D perspective
+  const effectiveColumns = useMemo(() => {
+    const unit = tileWidth + gap;
+    const dynamicCount = Math.ceil((dimensions.width * 2.2) / unit) + 4;
+    if (typeof columns === 'number' && columns > 0) {
+      return Math.max(columns, dynamicCount);
+    }
+    return Math.max(12, dynamicCount);
+  }, [columns, tileWidth, gap, dimensions.width]);
+
   // Distribute all 11 pictures across columns using rotational permutations so:
   // 1. Every column contains all unique images
   // 2. No picture appears adjacent or repeats in the same column
   const columnItems = useMemo(() => {
-    return Array.from({ length: columns }, (_, c) => {
+    return Array.from({ length: effectiveColumns }, (_, c) => {
       // Shift each column by (c * 3) to give distinct ordering and varied starting points
       const offset = (c * 3) % items.length;
       return items.map((_, i) => items[(i + offset) % items.length]);
     });
-  }, [items, columns]);
+  }, [items, effectiveColumns]);
 
   const columnMeta = useMemo(() => {
     const unit = tileHeight + gap;
     return columnItems.map(col => {
       // Height of one complete sequence of tiles
       const copyHeight = col.length * unit;
-      // Guarantee at least 4 seamless repeating sequences so the screen is always filled
-      const copies = Math.max(4, Math.ceil((containerHeight * 2.5) / copyHeight) + 2);
+      // Guarantee seamless repeating sequences so the screen is always filled
+      const copies = Math.max(4, Math.ceil((dimensions.height * 2.5) / copyHeight) + 2);
       return { copyHeight, copies };
     });
-  }, [columnItems, tileHeight, gap, containerHeight]);
-
-  useLayoutEffect(() => {
-    if (!containerRef.current) return;
-    const ro = new ResizeObserver(([entry]) => {
-      setContainerHeight(entry.contentRect.height || 600);
-    });
-    ro.observe(containerRef.current);
-    return () => ro.disconnect();
-  }, []);
+  }, [columnItems, tileHeight, gap, dimensions.height]);
 
   const baseVelocities = useMemo(() => {
     const dirSign = direction === 'up' ? 1 : -1;
@@ -137,7 +165,7 @@ const DriftWall = ({
       const plane = planeRef.current;
       if (!plane) return;
       plane.style.transform =
-        `translate(-50%, -50%) scale(1.18) ` +
+        `translate(-50%, -50%) scale(1.25) ` +
         `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
         `translateZ(${-depth}px)`;
     },

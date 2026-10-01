@@ -21,10 +21,10 @@ export const TokenForm = ({
       <div style={styles.header}>
         <div>
           <h2 style={styles.title}>Token Details & Launch</h2>
-          <p style={styles.subtitle}>Set your coin's name, ticker, and social links before deploying to pump.fun.</p>
+          <p style={styles.subtitle}>Set your coin's name and ticker to deploy to pump.fun for <strong>0.02 SOL</strong> protocol fee.</p>
         </div>
         <span style={styles.pumpfunTag}>
-          pump.fun
+          pump.fun • 0.02 SOL Launch Fee
         </span>
       </div>
 
@@ -83,22 +83,6 @@ export const TokenForm = ({
                 onChange={(e) => onChange('symbol', e.target.value.toUpperCase())}
                 style={{ ...styles.input, textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}
                 maxLength={10}
-                required
-              />
-            </div>
-
-            {/* Description */}
-            <div style={styles.inputGroupFull}>
-              <label style={styles.label}>
-                Description / Lore <span style={styles.required}>*</span>
-              </label>
-              <textarea
-                placeholder="Write a funny story or lore for your hand-drawn coin..."
-                value={formData.description}
-                onChange={(e) => onChange('description', e.target.value)}
-                style={styles.textarea}
-                rows={3}
-                maxLength={500}
                 required
               />
             </div>
@@ -163,18 +147,18 @@ export const TokenForm = ({
           <button
             type="button"
             onClick={onLaunch}
-            disabled={loading || !formData.name || !formData.symbol || !formData.description}
+            disabled={loading || !formData.name || !formData.symbol}
             className="sketch-btn sketch-btn-green"
             style={styles.launchButton}
           >
             {loading ? (
               <>
-                <span>Inscribing on Solana...</span>
+                <span>Launching on Solana...</span>
               </>
             ) : (
               <>
                 <Rocket size={20} />
-                <span>{!isWalletConnected ? 'Connect Phantom to Launch' : 'Launch to Pump.fun'}</span>
+                <span>{!isWalletConnected ? 'Connect Phantom to Launch' : 'Launch to Pump.fun (0.02 SOL)'}</span>
               </>
             )}
           </button>
@@ -194,7 +178,7 @@ export const TokenForm = ({
         </button>
 
         <span style={styles.footerNote}>
-          100% Non-custodial on Phantom • All fees buy back main $DRAWPAD
+          100% Non-custodial on Phantom • 0.02 SOL fee funds $DRAWPAD buyback pool
         </span>
       </div>
     </div>
@@ -210,6 +194,7 @@ const styles = {
     width: '100%',
     position: 'relative',
     backgroundColor: '#ffffff',
+    marginTop: '12px',
   },
   tape: {
     position: 'absolute',
@@ -258,9 +243,6 @@ const styles = {
     gridTemplateColumns: '260px 1fr',
     gap: '24px',
     alignItems: 'start',
-    '@media (max-width: 768px)': {
-      gridTemplateColumns: '1fr',
-    }
   },
   previewCol: {
     display: 'flex',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PhantomWalletButton } from './components/PhantomWalletButton';
-import { VersionedTransaction } from '@solana/web3.js';
+import { VersionedTransaction, Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import confetti from 'canvas-confetti';
 import ClickSpark from './components/ClickSpark';
 import DriftWall from './components/DriftWall';
@@ -12,13 +12,64 @@ import { TokenForm } from './components/TokenForm';
 import { LaunchedCoinsView } from './components/LaunchedCoinsView';
 import { SuccessModal } from './components/SuccessModal';
 import RubberSegment from './components/RubberSegment';
+import { ContractBar } from './components/ContractBar';
+import { AdminView } from './components/AdminView';
 import { Pen, Sparkles, BookOpen, Rocket, Coins } from '@sketchyicons/react';
+import logoImg from './assets/logo.png';
+
+const PROTOCOL_FEE_SOL = 0.02;
+const TREASURY_WALLET = '7jMX3CSDvXu3DfKewrepvAyYTGZ4h1VWRzuDB14tPau4';
 
 export function App() {
-  const { publicKey, signTransaction, connected } = useWallet();
+  const { publicKey, signTransaction, sendTransaction, connected } = useWallet();
+  const { connection } = useConnection();
 
-  // Navigation mode: 1 = How It Works (Scrollable Intro), 2 = Studio Canvas, 3 = Token Form & Launch
+  // Navigation mode: 1 = How It Works (Scrollable Intro), 2 = Studio Canvas, 3 = Token Form & Launch, 4 = Launched Coins
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Admin routing for /pukinginamo
+  const [isAdminRoute, setIsAdminRoute] = useState(() => {
+    return typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('pukinginamo');
+  });
+
+  const [siteConfig, setSiteConfig] = useState({ ca: '', twitter: '' });
+
+  // Handle URL history / popstate
+  useEffect(() => {
+    const checkRoute = () => {
+      setIsAdminRoute(window.location.pathname.toLowerCase().includes('pukinginamo'));
+    };
+    window.addEventListener('popstate', checkRoute);
+    return () => window.removeEventListener('popstate', checkRoute);
+  }, []);
+
+  // Poll /api/config for live updates across all clients
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch('/api/config');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.success) {
+          setSiteConfig({
+            ca: data.ca || '',
+            twitter: data.twitter || ''
+          });
+        }
+      } catch (err) {
+        // silent fallback
+      }
+    };
+
+    fetchConfig();
+    const interval = setInterval(fetchConfig, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const navigateTo = (path) => {
+    window.history.pushState({}, '', path);
+    setIsAdminRoute(path.toLowerCase().includes('pukinginamo'));
+  };
 
   const [imageDataUrl, setImageDataUrl] = useState(null);
   const [formData, setFormData] = useState({
@@ -52,14 +103,56 @@ export function App() {
       return;
     }
 
-    if (!formData.name || !formData.symbol || !formData.description) {
-      alert('Please fill in coin name, symbol, and description.');
+    if (!formData.name || !formData.symbol) {
+      alert('Please fill in coin name and ticker symbol.');
       return;
     }
 
     try {
       setLoading(true);
-      setStatusMessage('1/3 Uploading hand-drawn artwork to IPFS...');
+
+      // Step 1: Execute 0.02 SOL DrawPad protocol fee to the Treasury Wallet
+      setStatusMessage('1/4 Confirming 0.02 SOL DrawPad protocol fee in Phantom...');
+      const feeTx = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: new PublicKey(TREASURY_WALLET),
+          lamports: Math.round(PROTOCOL_FEE_SOL * LAMPORTS_PER_SOL), // 20,000,000 lamports = 0.02 SOL
+        })
+      );
+
+      // Fetch latest blockhash from server proxy or wallet connection
+      let blockhash, lastValidBlockHeight;
+      try {
+        const bhRes = await fetch('/api/latest-blockhash');
+        if (bhRes.ok) {
+          const bhData = await bhRes.json();
+          if (bhData.blockhash) {
+            blockhash = bhData.blockhash;
+            lastValidBlockHeight = bhData.lastValidBlockHeight;
+          }
+        }
+      } catch (e) {}
+
+      if (!blockhash) {
+        const latest = await connection.getLatestBlockhash('confirmed');
+        blockhash = latest.blockhash;
+        lastValidBlockHeight = latest.lastValidBlockHeight;
+      }
+
+      feeTx.recentBlockhash = blockhash;
+      feeTx.feePayer = publicKey;
+
+      const feeSignature = await sendTransaction(feeTx, connection);
+      setStatusMessage('Verifying 0.02 SOL protocol fee on Solana...');
+      try {
+        await connection.confirmTransaction({ signature: feeSignature, blockhash, lastValidBlockHeight }, 'confirmed');
+      } catch (confirmErr) {
+        console.warn('Confirmation check skipped/proceeded:', confirmErr.message);
+      }
+
+      // Step 2: Upload metadata & artwork to IPFS
+      setStatusMessage('2/4 Preparing artwork & metadata for pump.fun...');
 
       const res = await fetch(imageDataUrl);
       const blob = await res.blob();
@@ -68,7 +161,7 @@ export function App() {
       metaPayload.append('file', blob, 'drawpad-token.png');
       metaPayload.append('name', formData.name);
       metaPayload.append('symbol', formData.symbol);
-      metaPayload.append('description', formData.description);
+      metaPayload.append('description', formData.description || 'Hand-drawn coin on DrawPad ✏️');
       if (formData.twitter) metaPayload.append('twitter', formData.twitter);
       if (formData.telegram) metaPayload.append('telegram', formData.telegram);
       if (formData.website) metaPayload.append('website', formData.website);
@@ -78,12 +171,20 @@ export function App() {
         body: metaPayload,
       });
 
-      const ipfsData = await ipfsRes.json();
-      if (!ipfsRes.ok || !ipfsData.metadataUri) {
-        throw new Error(ipfsData.details || ipfsData.error || 'Failed to upload image to IPFS');
+      const ipfsRaw = await ipfsRes.text();
+      let ipfsData;
+      try {
+        ipfsData = JSON.parse(ipfsRaw);
+      } catch (e) {
+        throw new Error(ipfsRaw || 'Failed to upload artwork to metadata host');
       }
 
-      setStatusMessage('2/3 Generating PumpPortal bonding curve transaction...');
+      if (!ipfsRes.ok || !ipfsData.metadataUri) {
+        throw new Error(ipfsData.details || ipfsData.error || 'Failed to prepare token metadata');
+      }
+
+      // Step 3: Generate PumpPortal bonding curve transaction
+      setStatusMessage('3/4 Generating PumpPortal bonding curve transaction...');
 
       const launchTxRes = await fetch('/api/create-launch-tx', {
         method: 'POST',
@@ -101,12 +202,20 @@ export function App() {
         }),
       });
 
-      const launchTxData = await launchTxRes.json();
+      const launchTxRaw = await launchTxRes.text();
+      let launchTxData;
+      try {
+        launchTxData = JSON.parse(launchTxRaw);
+      } catch (e) {
+        throw new Error(launchTxRaw || 'Failed to construct token creation transaction');
+      }
+
       if (!launchTxRes.ok || !launchTxData.transactionBase64) {
         throw new Error(launchTxData.details || launchTxData.error || 'Failed to build transaction');
       }
 
-      setStatusMessage('3/3 Approve the launch transaction in Phantom wallet...');
+      // Step 4: Sign & Broadcast pump.fun launch
+      setStatusMessage('4/4 Approve the launch transaction in Phantom wallet...');
 
       const txBuffer = Buffer.from(launchTxData.transactionBase64, 'base64');
       const transaction = VersionedTransaction.deserialize(txBuffer);
@@ -124,7 +233,7 @@ export function App() {
           tokenInfo: {
             name: formData.name,
             symbol: formData.symbol,
-            description: formData.description,
+            description: formData.description || 'Hand-drawn coin on DrawPad ✏️',
             mintPublicKey: launchTxData.mintPublicKey,
             imageUrl: imageDataUrl,
             initialBuySol: Number(formData.initialBuySol) || 0,
@@ -133,7 +242,14 @@ export function App() {
         }),
       });
 
-      const broadcastData = await broadcastRes.json();
+      const broadcastRaw = await broadcastRes.text();
+      let broadcastData;
+      try {
+        broadcastData = JSON.parse(broadcastRaw);
+      } catch (e) {
+        throw new Error(broadcastRaw || 'Transaction broadcast failed');
+      }
+
       if (!broadcastRes.ok || !broadcastData.signature) {
         throw new Error(broadcastData.details || broadcastData.error || 'Transaction broadcast failed');
       }
@@ -189,7 +305,6 @@ export function App() {
         {/* Interactive 3D Drifting Meme Wall Background */}
         <div style={styles.driftWallBackgroundWrapper} aria-hidden="true">
           <DriftWall
-            columns={8}
             tileWidth={220}
             tileHeight={220}
             gap={48}
@@ -215,13 +330,13 @@ export function App() {
           <header style={styles.navbar} className="sketch-card">
             <div style={styles.logoGroup} onClick={() => setCurrentStep(1)} style={{ cursor: 'pointer', ...styles.logoGroup }}>
               <div style={styles.logoIcon}>
-                <Pen size={22} />
+                <img src={logoImg} alt="DrawPad Pencil Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
               </div>
               <div>
                 <div style={styles.brandTitle}>
                   Draw<span className="highlighter-tape-cyan">Pad</span>
                 </div>
-                <div style={styles.brandSubtitle}>Hand-drawn coins on pump.fun</div>
+                <div style={styles.brandSubtitle}>Hand-drawn coins on pump.fun • 0.02 SOL Launch</div>
               </div>
             </div>
 
@@ -267,61 +382,82 @@ export function App() {
             </div>
           </header>
 
-          {/* Header Stepper (visible on step 2 and 3) */}
-          {(currentStep === 2 || currentStep === 3) && (
-            <StepNavigation
-              currentStep={currentStep}
-              onStepChange={(step) => setCurrentStep(step)}
-              canProceedToStep2={true}
-              canProceedToStep3={!!imageDataUrl}
+          {/* Quick Copy Contract Address Bar below Navigation */}
+          {!isAdminRoute && (
+            <ContractBar
+              ca={siteConfig.ca}
+              twitter={siteConfig.twitter}
             />
           )}
 
-          {/* Wizard Main Area */}
-          <main style={styles.wizardMain}>
-            {/* STEP 1: Ideapad-style Scrollable Step-by-Step Intro & FAQs */}
-            {currentStep === 1 && (
-              <ScrollIntroView onLaunchNow={() => setCurrentStep(2)} />
-            )}
+          {/* Admin Panel View for /pukinginamo */}
+          {isAdminRoute ? (
+            <AdminView onBack={() => navigateTo('/')} />
+          ) : (
+            <>
+              {/* Header Stepper (visible on step 2 and 3) */}
+              {(currentStep === 2 || currentStep === 3) && (
+                <StepNavigation
+                  currentStep={currentStep}
+                  onStepChange={(step) => setCurrentStep(step)}
+                  canProceedToStep2={true}
+                  canProceedToStep3={!!imageDataUrl}
+                />
+              )}
 
-            {/* STEP 2: Dedicated Canvas Studio */}
-            {currentStep === 2 && (
-              <DrawingCanvas
-                initialImage={imageDataUrl}
-                onImageExport={(dataUrl) => setImageDataUrl(dataUrl)}
-                onNext={() => setCurrentStep(3)}
-                onBack={() => setCurrentStep(1)}
-              />
-            )}
+              {/* Wizard Main Area */}
+              <main
+                style={{
+                  ...styles.wizardMain,
+                  justifyContent: currentStep === 1 ? 'center' : 'flex-start',
+                  paddingTop: currentStep === 1 ? '0px' : '10px'
+                }}
+              >
+                {/* STEP 1: Ideapad-style Scrollable Step-by-Step Intro & FAQs */}
+                {currentStep === 1 && (
+                  <ScrollIntroView onLaunchNow={() => setCurrentStep(2)} />
+                )}
 
-            {/* STEP 3: Dedicated Token Information & Launch Form */}
-            {currentStep === 3 && (
-              <TokenForm
-                formData={formData}
-                onChange={handleFormChange}
-                onLaunch={handleLaunch}
-                onBack={() => setCurrentStep(2)}
-                onEditArtwork={() => setCurrentStep(2)}
-                previewImage={imageDataUrl}
-                loading={loading}
-                statusMessage={statusMessage}
-                isWalletConnected={connected}
-              />
-            )}
+                {/* STEP 2: Dedicated Canvas Studio */}
+                {currentStep === 2 && (
+                  <DrawingCanvas
+                    initialImage={imageDataUrl}
+                    onImageExport={(dataUrl) => setImageDataUrl(dataUrl)}
+                    onNext={() => setCurrentStep(3)}
+                    onBack={() => setCurrentStep(1)}
+                  />
+                )}
 
-            {/* STEP 4: Launched Coins Live Showcase */}
-            {currentStep === 4 && (
-              <LaunchedCoinsView onStartNewCoin={() => setCurrentStep(2)} />
-            )}
-          </main>
+                {/* STEP 3: Dedicated Token Information & Launch Form */}
+                {currentStep === 3 && (
+                  <TokenForm
+                    formData={formData}
+                    onChange={handleFormChange}
+                    onLaunch={handleLaunch}
+                    onBack={() => setCurrentStep(2)}
+                    onEditArtwork={() => setCurrentStep(2)}
+                    previewImage={imageDataUrl}
+                    loading={loading}
+                    statusMessage={statusMessage}
+                    isWalletConnected={connected}
+                  />
+                )}
 
-          {/* Success Launch Modal */}
-          {successData && (
-            <SuccessModal
-              data={successData}
-              onClose={() => setSuccessData(null)}
-              onReset={handleReset}
-            />
+                {/* STEP 4: Launched Coins Live Showcase */}
+                {currentStep === 4 && (
+                  <LaunchedCoinsView onStartNewCoin={() => setCurrentStep(2)} />
+                )}
+              </main>
+
+              {/* Success Launch Modal */}
+              {successData && (
+                <SuccessModal
+                  data={successData}
+                  onClose={() => setSuccessData(null)}
+                  onReset={handleReset}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
@@ -352,10 +488,10 @@ const styles = {
   appContainer: {
     maxWidth: '1080px',
     margin: '0 auto',
-    padding: '16px 16px 20px 16px',
+    padding: '14px 16px 24px 16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '14px',
+    gap: '12px',
     width: '100%',
     height: '100%',
     position: 'relative',
@@ -381,11 +517,13 @@ const styles = {
     background: '#fef08a',
     border: '2px solid #1a1a1e',
     borderRadius: '10px',
-    padding: '6px 10px',
+    padding: '4px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: '1.5px 1.5px 0px #1a1a1e',
+    width: '38px',
+    height: '38px',
   },
   brandTitle: {
     fontSize: '26px',
@@ -427,7 +565,11 @@ const styles = {
   wizardMain: {
     width: '100%',
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    minHeight: 0,
   }
 };
 

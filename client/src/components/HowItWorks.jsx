@@ -21,7 +21,7 @@ export const HowItWorks = ({ onStartDrawing }) => {
       num: '03',
       icon: <Rocket size={28} />,
       title: 'Launch on pump.fun',
-      desc: 'Approve the non-custodial transaction with Phantom. Your coin is live instantly on the bonding curve.',
+      desc: 'Approve the 0.02 SOL launch transaction with Phantom. Your coin is live instantly on the bonding curve.',
       color: 'var(--marker-cyan)',
     },
   ];

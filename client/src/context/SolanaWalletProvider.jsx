@@ -1,25 +1,32 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
-import { clusterApiUrl } from '@solana/web3.js';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 
 export const SolanaWalletProvider = ({ children }) => {
-  // Use Solana Mainnet endpoint for pump.fun launches
+  // Use high-performance, CORS-enabled Solana Mainnet RPC
   const endpoint = useMemo(() => {
-    return 'https://api.mainnet-beta.solana.com';
+    return 'https://solana-rpc.publicnode.com';
   }, []);
 
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter()
-    ],
-    []
-  );
+  // Use empty wallets array so Standard Wallets (Phantom, Solflare, etc.) are registered natively without duplicate warnings
+  const wallets = useMemo(() => [], []);
+
+  const onError = useCallback((error) => {
+    // Suppress expected user cancellations or popup closes
+    if (
+      error?.name === 'WalletConnectionError' ||
+      error?.message?.includes('User rejected') ||
+      error?.message?.includes('rejected the request')
+    ) {
+      return;
+    }
+    console.warn('Solana Wallet error:', error);
+  }, []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets} autoConnect={false} onError={onError}>
         <WalletModalProvider>
           {children}
         </WalletModalProvider>

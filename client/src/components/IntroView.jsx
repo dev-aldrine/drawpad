@@ -25,7 +25,7 @@ export const IntroView = ({ onProceed }) => {
       num: '03',
       icon: <Rocket size={30} />,
       title: 'Launch on Pump.fun Bonding Curve',
-      desc: 'Sign the non-custodial transaction with your Phantom wallet. Metadata uploads to IPFS and the coin goes live!',
+      desc: 'Approve the 0.02 SOL protocol fee with Phantom wallet. Metadata uploads to IPFS and your coin is deployed!',
       badge: 'Step 3',
       color: 'var(--marker-cyan)',
       sticker: 'BONDING'

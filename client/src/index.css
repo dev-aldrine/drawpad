@@ -126,30 +126,43 @@ body {
   animation: doodle-wiggle 0.3s ease-in-out infinite;
 }
 
-/* Sketch Box Utility */
-.sketch-card {
+/* ✏️ Hand-Drawn Sketch Box Utility (Applied to All Containers & Slides) */
+.sketch-card,
+.sketch-box {
   background: var(--card-bg);
-  border: 2.5px solid var(--sketch-border);
-  border-radius: 12px 14px 10px 15px;
-  box-shadow: var(--sketch-shadow);
+  border: 2.5px solid var(--sketch-border) !important;
+  /* Iconic Rough / Asymmetrical hand-drawn organic border radius */
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+  box-shadow: 4px 4px 0px #1a1a1e, -0.5px -0.5px 0px #1a1a1e !important;
+  filter: url(#pencil-stroke);
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sketch-card:hover {
-  box-shadow: var(--sketch-shadow-lg);
+  box-shadow: 5px 6px 0px #1a1a1e, -0.5px -0.5px 0px #1a1a1e !important;
 }
 
-/* Sketch Buttons with Spring Animations */
+/* Alternate organic curvature for inner sub-containers */
+.sketch-card-alt {
+  background: #f8fafc;
+  border: 2px solid var(--sketch-border) !important;
+  border-radius: 18px 255px 16px 225px/225px 17px 255px 14px !important;
+  box-shadow: 2.5px 2.5px 0px #1a1a1e !important;
+  filter: url(#pencil-stroke);
+}
+
+/* 🎨 Hand-Drawn Buttons with Natural Ink Contour */
 .sketch-btn {
   font-family: var(--font-handwriting);
   font-size: 19px;
   font-weight: 700;
   background: var(--marker-yellow);
   color: var(--ink-black);
-  border: 2.5px solid var(--sketch-border);
-  border-radius: 10px 14px 11px 13px;
+  border: 2.5px solid var(--sketch-border) !important;
+  border-radius: 255px 25px 225px 25px/25px 225px 25px 255px !important;
   padding: 10px 20px;
-  box-shadow: var(--sketch-shadow-sm);
+  box-shadow: 2.5px 3px 0px #1a1a1e, -0.5px -0.5px 0px #1a1a1e !important;
+  filter: url(#pencil-stroke);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -160,13 +173,13 @@ body {
 
 .sketch-btn:hover:not(:disabled) {
   transform: translate(-3px, -3px) rotate(-0.5deg);
-  box-shadow: var(--sketch-shadow);
+  box-shadow: 4.5px 5px 0px #1a1a1e !important;
   background: #fde047;
 }
 
 .sketch-btn:active:not(:disabled) {
   transform: translate(2px, 2px) rotate(0deg);
-  box-shadow: 0px 0px 0px #1a1a1e;
+  box-shadow: 0px 0px 0px #1a1a1e !important;
 }
 
 .sketch-btn:disabled {
@@ -180,6 +193,35 @@ body {
 }
 .sketch-btn-green:hover:not(:disabled) {
   background: #86efac;
+}
+
+/* 🖋️ Hand-Drawn Inputs & Textareas */
+input[type="text"],
+input[type="url"],
+input[type="password"],
+input[type="number"],
+textarea {
+  border: 2px solid var(--sketch-border) !important;
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+  filter: url(#pencil-stroke);
+}
+
+/* 〰️ SVG Hand-Drawn Wavy & Zig-Zag Border Utilities */
+.sketch-border-wavy {
+  border-bottom: 3px solid transparent;
+  border-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='6' viewBox='0 0 20 6'%3E%3Cpath d='M 0 3 Q 5 0, 10 3 T 20 3' fill='none' stroke='%231a1a1e' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 0 0 100% 0 repeat;
+}
+
+.sketch-border-zigzag {
+  border-bottom: 4px solid transparent;
+  border-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M 0 5 L 4 1 L 8 5 L 12 1 L 16 5' fill='none' stroke='%231a1a1e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0 100% 0 repeat;
+}
+
+/* 🏷️ Hand-Drawn Masking Tape */
+.sketch-tape {
+  border-radius: 4px;
+  filter: url(#hand-drawn-sketch);
+  box-shadow: 1px 1px 0px rgba(0,0,0,0.15);
 }
 
 /* Highlighter tape effect with hover tilt */

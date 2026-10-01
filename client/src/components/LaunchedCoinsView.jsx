@@ -106,7 +106,7 @@ export const LaunchedCoinsView = ({ onStartNewCoin }) => {
               Launched <span className="highlighter-tape-cyan">Coins</span>
             </h1>
             <p style={styles.subtitle}>
-              Browse hand-drawn coins deployed live to <strong>pump.fun</strong>. All fees generated across launched tokens are redirected to buy back the main DrawPad coin.
+              Browse hand-drawn coins deployed live to <strong>pump.fun</strong>. 100% of 0.02 SOL launch fees fund the main DrawPad ecosystem buyback pool.
             </p>
           </div>
 
@@ -289,7 +289,9 @@ const styles = {
     margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
+    gap: '24px',
+    paddingTop: '8px',
+    paddingBottom: '40px',
   },
   headerCard: {
     padding: '28px 24px 22px 24px',
@@ -299,10 +301,11 @@ const styles = {
     flexDirection: 'column',
     gap: '16px',
     borderRadius: '16px',
+    marginTop: '16px',
   },
   tapeHeader: {
     position: 'absolute',
-    top: '-12px',
+    top: '-13px',
     left: '28px',
     background: '#bbf7d0',
     border: '1.5px dashed #1a1a1e',
@@ -381,12 +384,13 @@ const styles = {
   coinCountBadge: {
     background: '#fef08a',
     border: '1.5px solid #1a1a1e',
-    borderRadius: '8px',
+    borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
     padding: '8px 14px',
     fontSize: '14px',
     fontWeight: '700',
     fontFamily: 'var(--font-mono)',
     whiteSpace: 'nowrap',
+    filter: 'url(#pencil-stroke)',
   },
   loadingBox: {
     padding: '48px 24px',
@@ -427,7 +431,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
-    borderRadius: '14px',
+    borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
   },
   cardTapeRow: {
     position: 'absolute',
@@ -461,7 +465,7 @@ const styles = {
   imageBox: {
     width: '100%',
     aspectRatio: '1 / 1',
-    borderRadius: '10px',
+    borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
     border: '2px solid #1a1a1e',
     overflow: 'hidden',
     backgroundColor: '#f8fafc',

@@ -69,6 +69,22 @@ export const SuccessModal = ({ data, onClose, onReset }) => {
               </a>
             </div>
           )}
+
+          {/* Buyback Pool Fee Redirection Info */}
+          <div style={styles.buybackBox}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span style={{ fontSize: '13px', fontWeight: '800', color: '#15803d', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }}></span>
+                Fee Buyback Protocol Active
+              </span>
+              <span style={{ fontSize: '11px', background: '#dcfce7', border: '1px solid #16a34a', color: '#166534', padding: '1px 6px', borderRadius: '4px', fontWeight: '800' }}>
+                100% BUYBACK
+              </span>
+            </div>
+            <div style={{ fontSize: '12px', color: '#475569', textAlign: 'left', lineHeight: '1.4' }}>
+              All 0.02 SOL launch fees fund the main DrawPad buyback treasury (<code>7jMX3...Pau4</code>) to support the token ecosystem.
+            </div>
+          </div>
         </div>
 
         <div style={styles.buttonGroup}>
@@ -182,6 +198,14 @@ const styles = {
     padding: '12px',
     borderRadius: '10px',
     border: '2px dashed #94a3b8',
+  },
+  buybackBox: {
+    background: '#f0fdf4',
+    border: '1.5px solid #16a34a',
+    borderRadius: '8px',
+    padding: '10px 12px',
+    marginTop: '6px',
+    boxShadow: '1px 1px 0px rgba(0,0,0,0.05)',
   },
   detailRow: {
     display: 'flex',

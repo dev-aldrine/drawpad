@@ -471,6 +471,7 @@ const styles = {
     width: '100%',
     position: 'relative',
     backgroundColor: '#ffffff',
+    marginTop: '12px',
   },
   tape: {
     position: 'absolute',

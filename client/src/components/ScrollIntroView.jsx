@@ -4,6 +4,7 @@ import { Pen, Coins, Rocket, Check, ArrowDown, ArrowUp, ChevronDown, Sparkles } 
 import RotatingText from './RotatingText';
 import BounceCards from './BounceCards';
 
+import logoImg from '../assets/logo.png';
 import dogeImg from '../../draw/doge.jpeg';
 import spodermanImg from '../../draw/spoderman.jpeg';
 import dogwiphapImg from '../../draw/dogwiphap.jpeg';
@@ -171,8 +172,8 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
       num: '03',
       title: 'Deploy to pump.fun & Fee Buybacks',
       subtitle: 'Step 3 • Live Launch & Tokenomics',
-      desc: 'Connect your Phantom Solana wallet. Approve the non-custodial launch. All creator trading fees generated across every coin launched on DrawPad are automatically redirected to buy back the main DrawPad token.',
-      highlights: ['100% Non-custodial signing with Phantom', 'Trading fees redirected to buy back the main launchpad coin', 'Live Solscan tx signature & instant trading link'],
+      desc: 'Connect your Phantom Solana wallet. Approve the non-custodial launch for only 0.02 SOL protocol fee (no mandatory dev buy required). 100% of platform launch fees fund the main $DRAWPAD buyback pool.',
+      highlights: ['0.02 SOL DrawPad protocol fee', '100% Non-custodial signing with Phantom', 'Launch fees fund the main $DRAWPAD buyback pool'],
       color: 'var(--marker-cyan)',
       tapeColor: '#bae6fd',
       icon: <Rocket size={32} />
@@ -182,15 +183,15 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
   const faqs = [
     {
       q: 'How does DrawPad launch my coin onto pump.fun?',
-      a: 'DrawPad communicates with the official PumpPortal Trade API. It uploads your hand-drawn artwork to IPFS, builds the versioned Solana transaction, and prompts your Phantom wallet for non-custodial signing.'
+      a: 'DrawPad communicates directly with the official PumpPortal Trade API. It uploads your hand-drawn artwork to IPFS, builds the versioned Solana transaction, and prompts your Phantom wallet for non-custodial signing.'
     },
     {
-      q: 'How does the Buyback & Fee redirection work?',
-      a: 'All platform fees accumulated from tokens launched through DrawPad are programmatically redirected to purchase and buy back the main DrawPad ecosystem coin, driving continuous volume and utility.'
+      q: 'How does the Buyback & Fee system work?',
+      a: 'Every 0.02 SOL protocol fee paid upon launching a coin goes directly to the DrawPad ecosystem treasury (7jMX3...Pau4) to buy back $DRAWPAD and support continuous platform growth.'
     },
     {
-      q: 'Do I need SOL to launch a coin?',
-      a: 'Yes, creating a token on pump.fun requires standard Solana network transaction fees (typically ~0.02 SOL), plus whatever amount of SOL you choose for your optional initial dev buy.'
+      q: 'How much SOL does it cost to launch a coin?',
+      a: 'Launching any hand-drawn token on DrawPad costs only 0.02 SOL protocol fee (+ standard Solana network execution fee). No mandatory dev buy is required.'
     },
     {
       q: 'Is DrawPad non-custodial?',
@@ -237,10 +238,8 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                   <span>DRAWPAD • HOW IT WORKS</span>
                 </div>
 
-                <div style={styles.heroBadgeWrap}>
-                  <span style={styles.sparkleDot}>✦</span>
-                  <span style={styles.heroBadgeText}>The Sketch-to-Launch Solana Protocol</span>
-                  <span style={styles.sparkleDot}>✦</span>
+                <div style={styles.heroLogoWrap}>
+                  <img src={logoImg} alt="DrawPad Pencil Logo" style={styles.heroLogoImg} />
                 </div>
 
                 <h1 style={styles.mainTitle}>
@@ -261,7 +260,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                 </h1>
 
                 <p style={styles.heroDesc}>
-                  Turn rough sketches into live Solana tokens on <strong>pump.fun</strong>. All fees generated from launched coins are redirected to buy back the main DrawPad token.
+                  Turn rough sketches into live Solana tokens on <strong>pump.fun</strong> for only <strong>0.02 SOL</strong> protocol fee (no mandatory dev buy required). All launch fees fund the main DrawPad ecosystem buyback pool.
                 </p>
 
                 <div style={styles.slideActionsRow}>
@@ -523,7 +522,9 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    minHeight: 'calc(100vh - 160px)',
+    flex: 1,
+    height: '100%',
+    minHeight: 0,
   },
   paginationSidebar: {
     position: 'absolute',
@@ -551,7 +552,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     perspective: '1200px',
-    minHeight: '480px',
+    margin: 'auto 0',
   },
   cardContainer: {
     width: '100%',
@@ -564,8 +565,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
-    boxShadow: '4px 4px 0px #1a1a1e',
-    borderRadius: '16px',
   },
   tapeTop: {
     position: 'absolute',
@@ -581,26 +580,18 @@ const styles = {
     letterSpacing: '0.08em',
     color: '#1a1a1e',
   },
-  heroBadgeWrap: {
-    display: 'inline-flex',
-    alignSelf: 'center',
+  heroLogoWrap: {
+    display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: '8px',
-    background: '#fef9c3',
-    border: '1.5px solid #1a1a1e',
-    borderRadius: '16px',
-    padding: '3px 14px',
-    boxShadow: '1px 1px 0px #1a1a1e',
-    marginTop: '4px',
+    marginTop: '6px',
+    marginBottom: '2px',
   },
-  sparkleDot: {
-    color: '#ca8a04',
-    fontWeight: 'bold',
-  },
-  heroBadgeText: {
-    fontSize: '14px',
-    fontWeight: '700',
-    color: '#1a1a1e',
+  heroLogoImg: {
+    width: '106px',
+    height: '106px',
+    objectFit: 'contain',
+    filter: 'drop-shadow(2.5px 3.5px 0px #1a1a1e)',
   },
   mainTitle: {
     fontSize: '42px',
@@ -638,7 +629,7 @@ const styles = {
   stepIconBox: {
     width: '56px',
     height: '56px',
-    borderRadius: '12px',
+    borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
     border: '2px solid #1a1a1e',
     display: 'flex',
     alignItems: 'center',
@@ -669,8 +660,9 @@ const styles = {
     flexDirection: 'column',
     gap: '8px',
     background: '#f8fafc',
-    border: '1.5px dashed #cbd5e1',
-    borderRadius: '10px',
+    border: '2px solid #1a1a1e',
+    borderRadius: '18px 255px 16px 225px/225px 17px 255px 14px',
+    boxShadow: '2px 2px 0px #1a1a1e',
     padding: '14px 18px',
   },
   highlightRow: {
@@ -732,10 +724,10 @@ const styles = {
   },
   faqItemCompact: {
     background: '#f8fafc',
-    border: '1.5px solid #1a1a1e',
-    borderRadius: '10px',
+    border: '2px solid #1a1a1e',
+    borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
     padding: '12px 16px',
-    boxShadow: '1.5px 1.5px 0px #1a1a1e',
+    boxShadow: '2px 2px 0px #1a1a1e',
   },
   faqQ: {
     display: 'flex',

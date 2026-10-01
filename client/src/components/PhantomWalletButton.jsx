@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Wallet, LogOut, Copy, Check } from '@sketchyicons/react';
 
 export const PhantomWalletButton = () => {
   const { wallet, wallets, select, connect, disconnect, connected, connecting, disconnecting, publicKey } = useWallet();
+  const { setVisible } = useWalletModal();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const dropdownRef = useRef(null);
@@ -25,21 +27,26 @@ export const PhantomWalletButton = () => {
       return;
     }
 
-    // Direct connect straight to Phantom without modal
     const phantom = wallets.find((w) => w.adapter.name.toLowerCase().includes('phantom')) || wallets[0];
     if (phantom) {
       try {
-        if (!wallet || wallet.adapter.name !== phantom.adapter.name) {
-          select(phantom.adapter.name);
-        }
-        await connect();
+        select(phantom.adapter.name);
+        await phantom.adapter.connect();
+        return;
       } catch (err) {
-        console.error('Direct Phantom connection error:', err);
-        if (typeof window !== 'undefined' && !window.solana?.isPhantom) {
-          window.open('https://phantom.app/', '_blank', 'noopener,noreferrer');
+        if (
+          err?.name === 'WalletConnectionError' ||
+          err?.message?.includes('User rejected') ||
+          err?.message?.includes('rejected the request')
+        ) {
+          return;
         }
+        console.warn('Phantom connection attempt, opening wallet selector:', err);
       }
     }
+
+    // Fallback: Open Solana Wallet Modal
+    setVisible(true);
   };
 
   const handleCopy = async (e) => {

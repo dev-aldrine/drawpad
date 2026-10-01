@@ -76,7 +76,7 @@ const styles = {
     gap: '12px',
     padding: '10px 14px',
     border: '2px solid #1a1a1e',
-    borderRadius: '10px',
+    borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
     transition: 'all 0.15s ease',
     textAlign: 'left',
     fontFamily: 'var(--font-handwriting)',
@@ -84,7 +84,7 @@ const styles = {
   stepIconBadge: {
     width: '32px',
     height: '32px',
-    borderRadius: '8px',
+    borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
     border: '1.5px solid #1a1a1e',
     background: '#ffffff',
     display: 'flex',
