@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrawPad - Cinematic Motion Graphic Trailer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Gloria+Hallelujah&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-heading: 'Cabinet Grotesk', -apple-system, sans-serif;
+      --font-handwriting: 'Gloria Hallelujah', cursive;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ink-black: #1a1a1e;
+      --marker-yellow: #fef08a;
+      --marker-cyan: #bae6fd;
+      --marker-green: #bbf7d0;
+      --marker-orange: #fed7aa;
+      --paper-white: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #060010;
+      color: #1a1a1e;
+      font-family: var(--font-heading);
+      overflow: hidden;
+      width: 1280px;
+      height: 720px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* SVG Hand-Drawn Filter */
+    .filter-defs {
+      position: absolute;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    /* Main 1280x720 16:9 Viewport Stage */
+    #stage {
+      width: 1280px;
+      height: 720px;
+      position: relative;
+      background: radial-gradient(circle at 50% 30%, #160a2c 0%, #090117 65%, #04000a 100%);
+      overflow: hidden;
+      perspective: 1200px;
+    }
+
+    /* ================= 3D DRIFT WALL BACKGROUND ================= */
+    .drift-wall-bg {
+      position: absolute;
+      top: -200px;
+      left: -200px;
+      width: 1680px;
+      height: 1120px;
+      display: grid;
+      grid-template-columns: repeat(6, 210px);
+      gap: 32px;
+      transform: rotateX(18deg) rotateY(-14deg) rotateZ(-6deg);
+      transform-origin: center center;
+      opacity: 0.45;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .drift-card {
+      width: 210px;
+      height: 210px;
+      background: #ffffff;
+      border: 2px solid #1a1a1e;
+      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+      padding: 10px;
+      box-shadow: 2px 3px 0 #1a1a1e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      filter: url(#pencil-stroke);
+    }
+
+    .drift-img {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1.5px solid #1a1a1e;
+      background: #fafaf9;
+    }
+
+    .drift-ticker {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      background: #fef08a;
+      border: 1px solid #1a1a1e;
+      padding: 1px 8px;
+      border-radius: 4px;
+    }
+
+    /* ================= SKETCH CARD STYLES ================= */
+    .sketch-card {
+      background: #ffffff;
+      border: 2.5px solid #1a1a1e;
+      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+      box-shadow: 4px 5px 0px #1a1a1e;
+      position: relative;
+      filter: url(#pencil-stroke);
+    }
+
+    .washi-tape {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-0.5deg);
+      border: 2px dashed #1a1a1e;
+      padding: 3px 20px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      color: #1a1a1e;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    .tape-yellow { background: var(--marker-yellow); }
+    .tape-cyan { background: var(--marker-cyan); }
+    .tape-green { background: var(--marker-green); }
+    .tape-orange { background: var(--marker-orange); }
+
+    .highlighter-cyan {
+      background: #bae6fd;
+      border: 1.5px dashed #1a1a1e;
+      padding: 0 10px;
+      border-radius: 4px;
+      color: #1a1a1e;
+      display: inline-block;
+      transform: rotate(-0.8deg);
+    }
+
+    /* ================= SCENES ORCHESTRATION ================= */
+    .scene-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Scene 1: Hero Logo Intro */
+    .hero-card {
+      width: 780px;
+      padding: 40px 36px 36px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .logo-pencil-hero {
+      width: 108px;
+      height: 108px;
+      object-fit: contain;
+      filter: drop-shadow(3px 4.5px 0px #1a1a1e);
+      margin-bottom: 2px;
+    }
+
+    .hero-title {
+      font-size: 58px;
+      font-weight: 900;
+      color: #1a1a1e;
+      line-height: 1.1;
+      letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+      font-size: 22px;
+      color: #475569;
+      font-family: var(--font-handwriting);
+      font-weight: 700;
+      max-width: 600px;
+      line-height: 1.4;
+    }
+
+    .hero-badges-row {
+      display: flex;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .pill-badge {
+      background: #f8fafc;
+      border: 2px solid #1a1a1e;
+      border-radius: 12px;
+      padding: 8px 18px;
+      font-size: 16px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      box-shadow: 2px 2px 0 #1a1a1e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Scene 2: The Sketch Studio */
+    .studio-card {
+      width: 900px;
+      padding: 34px 36px;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .studio-canvas-box {
+      width: 360px;
+      height: 360px;
+      background: #ffffff;
+      border: 2.5px solid #1a1a1e;
+      border-radius: 18px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 2px 2px 4px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    .drawing-layer-img {
+      width: 320px;
+      height: 320px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid #1a1a1e;
+    }
+
+    .pencil-cursor-anim {
+      position: absolute;
+      width: 32px;
+      height: 110px;
+      z-index: 25;
+      transform-origin: bottom center;
+      filter: drop-shadow(3px 6px 4px rgba(0,0,0,0.35));
+    }
+
+    .studio-info {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .studio-heading {
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+
+    .feature-step-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8fafc;
+      border: 2px solid #1a1a1e;
+      border-radius: 12px;
+      padding: 10px 16px;
+      box-shadow: 2px 2px 0 #1a1a1e;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .step-num-icon {
+      background: var(--marker-yellow);
+      border: 1.5px solid #1a1a1e;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* Scene 3: Live Token Launch & Phantom Sign */
+    .launch-spec-card {
+      width: 820px;
+      padding: 36px 36px 30px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .spec-header {
+      display: flex;
+      justifyContent: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #cbd5e1;
+      padding-bottom: 14px;
+    }
+
+    .token-preview-split {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .token-logo-square {
+      width: 180px;
+      height: 180px;
+      border-radius: 14px;
+      border: 2px solid #1a1a1e;
+      overflow: hidden;
+      background: #f8fafc;
+      box-shadow: 2px 2px 0 #1a1a1e;
+    }
+
+    .token-form-details {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-row-fake {
+      display: flex;
+      justifyContent: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border: 2px solid #1a1a1e;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .phantom-btn-big {
+      background: #bbf7d0;
+      border: 2.5px solid #1a1a1e;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 22px;
+      font-weight: 900;
+      color: #1a1a1e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 4px 4px 0 #1a1a1e;
+    }
+
+    /* Scene 4: Outro Branding */
+    .outro-card {
+      width: 840px;
+      padding: 44px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .outro-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .outro-brand-text {
+      font-size: 78px;
+      font-weight: 900;
+      color: #1a1a1e;
+      line-height: 1;
+    }
+
+    .buyback-pool-banner {
+      background: #f0fdf4;
+      border: 2px solid #16a34a;
+      border-radius: 14px;
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 2px 2px 0 rgba(22, 163, 74, 0.3);
+    }
+
+    .buyback-dot {
+      width: 12px;
+      height: 12px;
+      background: #16a34a;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #16a34a;
+    }
+
+    .cta-button-glowing {
+      background: #fef08a;
+      border: 3px solid #1a1a1e;
+      border-radius: 16px;
+      padding: 16px 42px;
+      font-size: 26px;
+      font-weight: 900;
+      box-shadow: 5px 5px 0 #1a1a1e;
+      color: #1a1a1e;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SVG Hand-Drawn Wobbly Displacement Filter -->
+  <svg class="filter-defs">
+    <defs>
+      <filter id="pencil-stroke" x="-2%" y="-2%" width="104%" height="104%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="stage">
+    
+    <!-- ================= 3D MEME DRIFT WALL ================= -->
+    <div class="drift-wall-bg" id="driftWall">
+      <div class="drift-card"><img src="/draw/doge.jpeg" class="drift-img"><span class="drift-ticker">$DOGE</span></div>
+      <div class="drift-card"><img src="/draw/pepe.jpeg" class="drift-img"><span class="drift-ticker">$PEPE</span></div>
+      <div class="drift-card"><img src="/draw/dogwiphap.jpeg" class="drift-img"><span class="drift-ticker">$DOGWIPHAP</span></div>
+      <div class="drift-card"><img src="/draw/spoderman.jpeg" class="drift-img"><span class="drift-ticker">$SPODERMAN</span></div>
+      <div class="drift-card"><img src="/draw/tromp.jpeg" class="drift-img"><span class="drift-ticker">$TROMP</span></div>
+      <div class="drift-card"><img src="/draw/solono.png" class="drift-img"><span class="drift-ticker">$SOLONO</span></div>
+      <div class="drift-card"><img src="/draw/raket.png" class="drift-img"><span class="drift-ticker">$RAKET</span></div>
+      <div class="drift-card"><img src="/draw/dimond.png" class="drift-img"><span class="drift-ticker">$DIMOND</span></div>
+      <div class="drift-card"><img src="/draw/stoank.png" class="drift-img"><span class="drift-ticker">$STOANK</span></div>
+      <div class="drift-card"><img src="/draw/pompfon.png" class="drift-img"><span class="drift-ticker">$POMPFON</span></div>
+      <div class="drift-card"><img src="/draw/bit.png" class="drift-img"><span class="drift-ticker">$BIT</span></div>
+      <div class="drift-card"><img src="/draw/doge.jpeg" class="drift-img"><span class="drift-ticker">$DOGE</span></div>
+    </div>
+
+    <!-- ================= SCENE 1: HERO & BRAND HOOK ================= -->
+    <div class="scene-container" id="scene1">
+      <div class="sketch-card hero-card">
+        <div class="washi-tape tape-yellow">DRAWPAD • HOW IT WORKS</div>
+        
+        <img src="/logo.png" alt="DrawPad Logo" class="logo-pencil-hero" id="heroPencil">
+
+        <h1 class="hero-title">
+          Draw it. <span class="highlighter-cyan" id="rotText">Launch it.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Turn rough sketches into live Solana memecoins in seconds. No boring AI slop—100% authentic community art.
+        </p>
+
+        <div class="hero-badges-row">
+          <div class="pill-badge" style="background: var(--marker-yellow);">✏️ Live Sketch Studio</div>
+          <div class="pill-badge" style="background: var(--marker-cyan);">⚡ 0.02 SOL Protocol Fee</div>
+          <div class="pill-badge" style="background: var(--marker-green);">🔒 100% Non-Custodial</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SCENE 2: CANVAS INKER IN ACTION ================= -->
+    <div class="scene-container" id="scene2">
+      <div class="sketch-card studio-card">
+        <div class="washi-tape tape-cyan">PHASE 01 • DRAWING CANVAS</div>
+
+        <div class="studio-canvas-box">
+          <img src="/draw/dogwiphap.jpeg" class="drawing-layer-img" id="liveSketchImg">
+          <!-- Animated Sketch Pencil -->
+          <img src="/logo.png" class="pencil-cursor-anim" id="studioPencil">
+        </div>
+
+        <div class="studio-info">
+          <h2 class="studio-heading">Doodle your masterpiece on the canvas.</h2>
+          <div class="feature-step-row">
+            <div class="step-num-icon">1</div>
+            <span>Custom pencil sizes, marker inks & eraser</span>
+          </div>
+          <div class="feature-step-row" style="background: #fef08a;">
+            <div class="step-num-icon">2</div>
+            <span>Decentralized IPFS artwork metadata storage</span>
+          </div>
+          <div class="feature-step-row" style="background: #bbf7d0;">
+            <div class="step-num-icon">3</div>
+            <span>No AI generation. Pure community creativity.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SCENE 3: TOKEN LAUNCH & SEND ================= -->
+    <div class="scene-container" id="scene3">
+      <div class="sketch-card launch-spec-card">
+        <div class="washi-tape tape-green">PHASE 02 • TOKEN LAUNCHPAD</div>
+
+        <div class="spec-header">
+          <div>
+            <h2 style="font-size: 28px; font-weight: 800;">Token Details & Launch</h2>
+            <p style="font-size: 15px; color: #64748b;">Deploying to pump.fun for 0.02 SOL protocol fee</p>
+          </div>
+          <div class="pill-badge" style="background: #fed7aa; font-size: 14px;">pump.fun • 0.02 SOL Fee</div>
+        </div>
+
+        <div class="token-preview-split">
+          <div class="token-logo-square">
+            <img src="/draw/dogwiphap.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div class="token-form-details">
+            <div class="form-row-fake">
+              <span style="color: #64748b;">Coin Name:</span>
+              <span>Dog Wif Hat</span>
+            </div>
+            <div class="form-row-fake">
+              <span style="color: #64748b;">Ticker Symbol:</span>
+              <span style="color: #0284c7;">$DOGWIPHAP</span>
+            </div>
+            <div class="form-row-fake" style="background: #f0fdf4; border-color: #16a34a;">
+              <span style="color: #166534; font-weight: 800;">Fee Buyback Protocol:</span>
+              <span style="color: #166534; font-weight: 800;">100% BUYBACK ACTIVE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="phantom-btn-big" id="launchBtn">
+          <span>🚀 Launch to Pump.fun (0.02 SOL)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SCENE 4: DEGEN OUTRO & SOLANA CALL TO ACTION ================= -->
+    <div class="scene-container" id="scene4">
+      <div class="sketch-card outro-card">
+        <div class="washi-tape tape-orange">JOIN THE MEME REVOLUTION</div>
+
+        <div class="outro-brand-row">
+          <img src="/logo.png" style="width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(3px 4px 0 #1a1a1e);">
+          <h1 class="outro-brand-text">
+            Draw<span class="highlighter-cyan">Pad</span>
+          </h1>
+        </div>
+
+        <div class="buyback-pool-banner">
+          <div class="buyback-dot"></div>
+          <div style="text-align: left;">
+            <div style="font-size: 16px; font-weight: 800; color: #166534; font-family: var(--font-mono);">
+              100% LAUNCH FEE BUYBACK POOL
+            </div>
+            <div style="font-size: 14px; color: #475569; font-family: var(--font-handwriting);">
+              Every launch funds the $DRAWPAD ecosystem buyback treasury (7jMX3...Pau4)
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-button-glowing">
+          ✏️ PICK UP THE PEN & DRAW NOW
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 4px;">
+          <div class="pill-badge" style="background: #ffffff;">🪐 Live on Solana</div>
+          <div class="pill-badge" style="background: #fef08a;">$DRAWPAD</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Drift wall continuous drifting motion
+    gsap.to('#driftWall', {
+      y: -180,
+      x: 60,
+      duration: 16,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    });
+
+    // Master Cinematic GSAP Timeline matching website brand & theme
+    const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.8 });
+
+    // Rotating text words for Scene 1
+    const rotWords = ['Launch it.', 'Pump it.', 'Trade it.', 'Meme it.'];
+    let wordIdx = 0;
+
+    // ================= SCENE 1 (0s - 3.8s) =================
+    tl.set('#scene1', { autoAlpha: 1 })
+      .from('.hero-card', { scale: 0.8, y: 30, opacity: 0, duration: 0.7, ease: 'back.out(1.6)' })
+      .from('#heroPencil', { scale: 0, rotate: -45, duration: 0.5, ease: 'elastic.out(1, 0.6)' }, '-=0.3')
+      .from('.pill-badge', { y: 20, opacity: 0, stagger: 0.1, duration: 0.4, ease: 'power2.out' }, '-=0.2')
+      .to('.hero-card', { scale: 0.95, y: -20, opacity: 0, duration: 0.45, ease: 'power3.in' }, '+=2.0');
+
+    // ================= SCENE 2: Canvas Studio (3.8s - 7.5s) =================
+    tl.set('#scene2', { autoAlpha: 1 })
+      .from('.studio-card', { scale: 0.75, opacity: 0, duration: 0.65, ease: 'back.out(1.4)' })
+      .fromTo('#studioPencil', 
+        { x: -100, y: 100, rotate: -40 },
+        { x: 60, y: -40, rotate: -15, duration: 1.2, ease: 'power1.inOut' }, '-=0.2')
+      .from('.feature-step-row', { x: 40, opacity: 0, stagger: 0.12, duration: 0.35, ease: 'power2.out' }, '-=0.8')
+      .to('.studio-card', { scale: 0.95, y: -20, opacity: 0, duration: 0.45, ease: 'power3.in' }, '+=1.6');
+
+    // ================= SCENE 3: Token Spec & Launch (7.5s - 11.2s) =================
+    tl.set('#scene3', { autoAlpha: 1 })
+      .from('.launch-spec-card', { scale: 0.8, opacity: 0, duration: 0.6, ease: 'back.out(1.5)' })
+      .from('.token-logo-square', { scale: 0.5, opacity: 0, duration: 0.4, ease: 'back.out(2)' }, '-=0.2')
+      .from('.form-row-fake', { x: 30, opacity: 0, stagger: 0.1, duration: 0.3, ease: 'power2.out' }, '-=0.2')
+      .to('#launchBtn', { 
+        scale: 1.06, 
+        background: '#86efac', 
+        duration: 0.25, 
+        yoyo: true, 
+        repeat: 1,
+        onStart: () => {
+          confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 } });
+        }
+      }, '+=0.4')
+      .to('.launch-spec-card', { scale: 0.95, y: -20, opacity: 0, duration: 0.45, ease: 'power3.in' }, '+=1.8');
+
+    // ================= SCENE 4: Outro Branding (11.2s - 15.0s) =================
+    tl.set('#scene4', { autoAlpha: 1 })
+      .from('.outro-card', { scale: 0.8, opacity: 0, duration: 0.65, ease: 'back.out(1.6)' })
+      .from('.buyback-pool-banner', { y: 20, opacity: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
+      .from('.cta-button-glowing', { scale: 0.85, opacity: 0, duration: 0.4, ease: 'elastic.out(1, 0.6)' }, '-=0.1')
+      .to('.outro-card', { opacity: 0, duration: 0.6, ease: 'power2.in' }, '+=2.4');
+  </script>
+</body>
+</html>
