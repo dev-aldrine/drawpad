@@ -2,6 +2,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Pen, Coins, Rocket, Check, ArrowDown, ArrowUp, ChevronDown, Sparkles } from '@sketchyicons/react';
 import RotatingText from './RotatingText';
+import BounceCards from './BounceCards';
+
+import pepeImg from '../../draw/pepe.jpeg';
+import dogeImg from '../../draw/doge.jpeg';
+import spodermanImg from '../../draw/spoderman.jpeg';
+import dogwiphapImg from '../../draw/dogwiphap.jpeg';
+import trompImg from '../../draw/tromp.jpeg';
+
+const BOUNCE_IMAGES = [
+  pepeImg,
+  dogeImg,
+  spodermanImg,
+  dogwiphapImg,
+  trompImg
+];
+
+const BOUNCE_TRANSFORMS = [
+  'rotate(10deg) translate(-140px)',
+  'rotate(5deg) translate(-70px)',
+  'rotate(-3deg)',
+  'rotate(-10deg) translate(70px)',
+  'rotate(2deg) translate(140px)'
+];
 
 export const ScrollIntroView = ({ onLaunchNow }) => {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -287,15 +310,31 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                   </div>
                 </div>
 
-                <p style={styles.cardDesc}>{steps[0].desc}</p>
-
-                <div style={styles.highlightsBox}>
-                  {steps[0].highlights.map((h, i) => (
-                    <div key={i} style={styles.highlightRow}>
-                      <div style={styles.checkIconWrap}><Check size={14} /></div>
-                      <span style={styles.highlightText}>{h}</span>
+                <div style={styles.stepOneContentWrapper}>
+                  <div style={styles.stepOneLeft}>
+                    <p style={styles.cardDesc}>{steps[0].desc}</p>
+                    <div style={styles.highlightsBox}>
+                      {steps[0].highlights.map((h, i) => (
+                        <div key={i} style={styles.highlightRow}>
+                          <div style={styles.checkIconWrap}><Check size={14} /></div>
+                          <span style={styles.highlightText}>{h}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+
+                  <div style={styles.bounceCardsWrapper}>
+                    <BounceCards
+                      images={BOUNCE_IMAGES}
+                      containerWidth={340}
+                      containerHeight={170}
+                      animationDelay={0.15}
+                      animationStagger={0.06}
+                      easeType="elastic.out(1, 0.6)"
+                      transformStyles={BOUNCE_TRANSFORMS}
+                      enableHover={true}
+                    />
+                  </div>
                 </div>
 
                 <div style={styles.navigationControls}>
@@ -651,6 +690,26 @@ const styles = {
     fontSize: '16px',
     fontWeight: '600',
     color: '#1e293b',
+  },
+  stepOneContentWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '24px',
+    flexWrap: 'wrap',
+  },
+  stepOneLeft: {
+    flex: '1 1 300px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  bounceCardsWrapper: {
+    flex: '0 0 auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 0',
   },
   navigationControls: {
     display: 'flex',
