@@ -234,7 +234,7 @@ export const TokenForm = ({
         </button>
 
         <span style={styles.footerNote}>
-          Hand-signed on Phantom • Verified by PumpPortal
+          100% Non-custodial on Phantom • All fees buy back main $DRAWPAD
         </span>
       </div>
     </div>

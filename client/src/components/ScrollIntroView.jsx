@@ -169,10 +169,10 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
     },
     {
       num: '03',
-      title: 'Deploy to pump.fun via PumpPortal',
-      subtitle: 'Step 3 • Live Launch',
-      desc: 'Connect your Phantom or Solflare Solana wallet. Approve the non-custodial transaction. The bonding curve is created immediately on pump.fun and your coin is instantly tradable.',
-      highlights: ['100% Non-custodial signing with Phantom', 'Direct pump.fun bonding curve integration', 'Live Solscan tx signature & instant trading link'],
+      title: 'Deploy to pump.fun & Fee Buybacks',
+      subtitle: 'Step 3 • Live Launch & Tokenomics',
+      desc: 'Connect your Phantom Solana wallet. Approve the non-custodial launch. All creator trading fees generated across every coin launched on DrawPad are automatically redirected to buy back the main DrawPad token.',
+      highlights: ['100% Non-custodial signing with Phantom', 'Trading fees redirected to buy back the main launchpad coin', 'Live Solscan tx signature & instant trading link'],
       color: 'var(--marker-cyan)',
       tapeColor: '#bae6fd',
       icon: <Rocket size={32} />
@@ -183,6 +183,10 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
     {
       q: 'How does DrawPad launch my coin onto pump.fun?',
       a: 'DrawPad communicates with the official PumpPortal Trade API. It uploads your hand-drawn artwork to IPFS, builds the versioned Solana transaction, and prompts your Phantom wallet for non-custodial signing.'
+    },
+    {
+      q: 'How does the Buyback & Fee redirection work?',
+      a: 'All platform fees accumulated from tokens launched through DrawPad are programmatically redirected to purchase and buy back the main DrawPad ecosystem coin, driving continuous volume and utility.'
     },
     {
       q: 'Do I need SOL to launch a coin?',
@@ -257,7 +261,7 @@ export const ScrollIntroView = ({ onLaunchNow }) => {
                 </h1>
 
                 <p style={styles.heroDesc}>
-                  Turn rough sketches into live Solana tokens on <strong>pump.fun</strong>. Hand-drawn art meets instant bonding curves.
+                  Turn rough sketches into live Solana tokens on <strong>pump.fun</strong>. All fees generated from launched coins are redirected to buy back the main DrawPad token.
                 </p>
 
                 <div style={styles.slideActionsRow}>

@@ -106,7 +106,7 @@ export const LaunchedCoinsView = ({ onStartNewCoin }) => {
               Launched <span className="highlighter-tape-cyan">Coins</span>
             </h1>
             <p style={styles.subtitle}>
-              Browse hand-drawn coins deployed live to <strong>pump.fun</strong> via DrawPad bonding curves.
+              Browse hand-drawn coins deployed live to <strong>pump.fun</strong>. All fees generated across launched tokens are redirected to buy back the main DrawPad coin.
             </p>
           </div>
 
